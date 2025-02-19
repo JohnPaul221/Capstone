@@ -21,47 +21,40 @@ require_once 'Config/Database.php';
             margin: 0;
             flex-direction: column;
         }
-
         .header {
-            background-color: rgba(0, 0, 0, 0.0);
             color: white;
             padding: 10px 20px;
             border-radius: 5px;
             margin-bottom: 20px;
             width: 100%;
             max-width: 400px;
-            display: flex; /* Use flexbox for alignment */
-            align-items: center; /* Center items vertically */
-            justify-content: space-between; /* Space between logo and text */
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-
         .header img {
-            height: 8em; /* Set the height of the logo */
-            width: auto; /* Maintain aspect ratio */
-            margin-right: 10px; /* Space between logo and text */
+            height: 8em;
+            width: auto;
+            margin-right: 10px;
         }
-
         .header h1 {
-            margin: 0; /* Remove default margin */
-            font-size: 2em; /* Set font size */
-            text-align: center; /* Center text */
-            flex-grow: 1; /* Allow the h1 to take up available space */
-            line-height: 1; /* Adjust line height to remove extra space */
+            margin: 0;
+            font-size: 2em;
+            text-align: center;
+            flex-grow: 1;
+            line-height: 1;
         }
-
         .login-container {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.5);
             padding: 50px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 300px;
         }
-
         .login-container h2 {
             margin-bottom: 20px;
             text-align: center;
         }
-
         .login-container input {
             width: 100%;
             padding: 10px;
@@ -69,7 +62,6 @@ require_once 'Config/Database.php';
             border: 1px solid #ccc;
             border-radius: 5px;
         }
-
         .login-container button {
             width: 100%;
             padding: 10px;
@@ -79,23 +71,14 @@ require_once 'Config/Database.php';
             border-radius: 5px;
             cursor: pointer;
         }
-
         .login-container button:hover {
             background-color: #0056b3;
         }
-
-        .success {
-            color: green;
-            text-align: center;
-            font-size: 1.5em; /* Increase font size for success message */
-            margin-top: 10px; /* Add some space above the message */
-        }
-
         .error {
             color: red;
             text-align: center;
-            font-size: 1.5em; /* Increase font size for error message */
-            margin-top: 10px; /* Add some space above the message */
+            font-size: 1.5em;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -116,13 +99,16 @@ require_once 'Config/Database.php';
     <?php
     $valid_username = "admin";
     $valid_password = "admin1";
+    $login_attempted = false;
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        $login_attempted = true;
         $username = $_POST['username'];
         $password = $_POST['password'];
 
         if ($username === $valid_username && $password === $valid_password) {
-            echo "<p class='success'>Login successful!</p>";
+            header("Location: dashboard.php");
+            exit();
         } else {
             echo "<p class='error'>Invalid username or password.</p>";
         }
