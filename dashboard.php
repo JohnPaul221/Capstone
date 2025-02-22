@@ -14,7 +14,7 @@ require_once 'Config/Database.php';
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4; /* Light background color for contrast */
+            background-color: #f4f4f4;
         }
 
         #main {
@@ -23,50 +23,57 @@ require_once 'Config/Database.php';
         }
 
         .sidebar {
-            display: none; /* Hide by default */
+            display: none;
             height: 100%;
-            width: 250px; /* Increased width for sidebar */
+            width: 250px;
             position: fixed;
             top: 0;
-            left: -250px; /* Initially hidden off-screen */
-            background-color: #ffffff; /* White background for sidebar */
+            left: -250px;
+            background-color: #ffffff;
             color: black;
-            transition: left 0.3s ease; /* Sliding effect */
-            box-shadow: 2px 0 5px rgba(0,0,0,0.5); /* Shadow for depth */
-            padding: 20px; /* Spacing inside the sidebar */
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+            padding: 20px;
         }
+
         .sidebar.open {
-            display: block; /* Show when open */
-            left: 0; /* Slide in */
+            display: block;
+            left: 0;
         }
 
         .sidebar h2 {
             margin-top: 0;
-            color: #333; /* Darker text color for headings */
+            color: #333;
         }
 
         .sidebar ul {
-            list-style: none; /* Remove bullet points */
-            padding: 0; /* Remove default padding */
+            list-style: none;
+            padding: 0;
         }
 
         .sidebar li {
-            margin: 15px 0; /* Space between items */
+            margin: 10px 0;
         }
 
         .sidebar a {
-            text-decoration: none; /* Remove underline */
-            color: #555; /* Default link color */
-            display: block; /* Make the link a block element */
-            padding: 10px; /* Add some padding */
-            border: 2px solid transparent; /* Default border */
-            border-radius: 5px; /* Rounded corners */
-            transition: border-color 0.3s ease; /* Smooth transition for border color */
+            background-color: #f7f7f7;
+            text-decoration: none;
+            color: #555;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            border: 1px solid transparent;
         }
 
         .sidebar a:hover {
-            color: #000; /* Change color on hover */
-            border-color: #007BFF; /* Change border color on hover */
+            background-color: #eaeaea;
+            color: #000;
+        }
+
+        .sidebar a i {
+            margin-right: 10px;
         }
 
         #openBtn {
@@ -88,11 +95,24 @@ require_once 'Config/Database.php';
             right: 15px;
             font-size: 24px;
         }
+
+        #newStudentBtn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 16px;
+            background-color: #4CAF50; /* Green background */
+            color: white; /* White text */
+            border: none; /* No border */
+            padding: 10px 15px; /* Padding */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Pointer cursor on hover */
+        }
     </style>
 </head>
 <body>
 <div id="sidebar" class="sidebar">
-    <button id="closeBtn"><i class="fa-solid fa-xmark"></i></button>
+    <button id="closeBtn"><i class=" fa-solid fa-xmark"></i></button>
     <h2>Menu</h2>
     <ul>
         <li><a href="BSCS.php">BSCS</a></li>
@@ -101,20 +121,24 @@ require_once 'Config/Database.php';
         <li><a href="ACT.php">ACT</a></li>
     </ul>
 </div>
+
+
 <div id="main">
     <button id="openBtn"><i class="fa-solid fa-bars"></i></button>
+    <a id="newStudentBtn" href="Enrollment_form.php">+ New Student</a>
 </div>
+
 <script>
     document.getElementById("openBtn").onclick = function() {
         const sidebar = document.getElementById("sidebar");
         sidebar.classList.add("open");
-        sidebar.style.display = "block"; // Show sidebar
+        sidebar.style.display = "block";
     };
 
     document.getElementById("closeBtn").onclick = function() {
         const sidebar = document.getElementById("sidebar");
         sidebar.classList.remove("open");
-        sidebar.style.display = "none"; // Hide sidebar
+        sidebar.style.display = "none";
     };
 </script>
 </body>
