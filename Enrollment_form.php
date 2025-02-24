@@ -1,23 +1,25 @@
 <?php
-// Start the session
 global $conn;
 session_start();
-
-// Include the database connection file
-require_once 'Config/Database.php'; // Adjust the path as necessary
+require_once 'Config/Database.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Get form data
     $first_name = $_POST['first_name'];
     $middle_name = $_POST['middle_name'];
     $last_name = $_POST['last_name'];
     $email = $_POST['email'];
     $contact = $_POST['contact'];
-    $course_id = $_POST['course']; // This will now be the selected course name
+    $course_id = $_POST['course'];
+    $year_level = $_POST['year_level']; // Capture year level
 
+    $allowed_courses = ['BSCS', 'BSENTREP', 'BSAIS', 'ACT'];
+    if (!in_array($course_id, $allowed_courses)) {
+        die("Invalid course");
+    }
 
-    $stmt = $conn->prepare("INSERT INTO students (first_name, middle_name, last_name, email, contact, course_code) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssis", $first_name, $middle_name, $last_name, $email, $contact, $course_id);
+    // Update SQL query to exclude academic_year
+    $stmt = $conn->prepare("INSERT INTO students (first_name, middle_name, last_name, email, contact, course_id, year_level) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssssss", $first_name, $middle_name, $last_name, $email, $contact, $course_id, $year_level);
 
     if ($stmt->execute()) {
         $_SESSION['success_message'] = "Enrollment successful!";
@@ -35,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 header("Location: ACT.php");
                 break;
             default:
-                header("Location: index.php"); // Fallback if course is not recognized
+                header("Location: index.php");
                 break;
         }
         exit();
@@ -117,7 +119,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     if (isset($_SESSION['error_message'])) {
         echo '<div class="message" style="color: red;">' . $_SESSION['error_message'] . '</div>';
-        unset($_SESSION['error_message']); // Clear the message after displaying
+        unset($_SESSION['error_message']);
     }
     ?>
 
@@ -127,6 +129,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <input type="text" name="last_name" placeholder="Last Name:" required>
         <input type="email" name="email" placeholder="Email:" required>
         <input type="text" name="contact" placeholder="Contact Number:" required>
+
+        <select name="year_level" required>
+            <option value="" disabled selected>Select Year Level:</option>
+            <option value="First Year">First Year</option>
+            <option value="Second Year">Second Year</option>
+            <option value="Third Year">Third Year</option>
+            <option value="Fourth Year">Fourth Year</option>
+        </select>
 
         <select name="course" required>
             <option value="" disabled selected>Select Course:</option>

@@ -101,12 +101,12 @@ require_once 'Config/Database.php';
             top: 20px;
             right: 20px;
             font-size: 16px;
-            background-color: #4CAF50; /* Green background */
-            color: white; /* White text */
-            border: none; /* No border */
-            padding: 10px 15px; /* Padding */
-            border-radius: 5px; /* Rounded corners */
-            cursor: pointer; /* Pointer cursor on hover */
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -121,20 +121,16 @@ require_once 'Config/Database.php';
         <li><a href="ACT.php">ACT</a></li>
     </ul>
 </div>
-
-
 <div id="main">
     <button id="openBtn"><i class="fa-solid fa-bars"></i></button>
     <a id="newStudentBtn" href="Enrollment_form.php">+ New Student</a>
 </div>
-
 <script>
     document.getElementById("openBtn").onclick = function() {
         const sidebar = document.getElementById("sidebar");
         sidebar.classList.add("open");
         sidebar.style.display = "block";
     };
-
     document.getElementById("closeBtn").onclick = function() {
         const sidebar = document.getElementById("sidebar");
         sidebar.classList.remove("open");

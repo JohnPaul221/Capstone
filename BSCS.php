@@ -1,20 +1,41 @@
 <?php
-
 global $conn;
 session_start();
-
 require_once 'Config/Database.php';
 
-$query = "SELECT first_name, middle_name, last_name, email, contact FROM students WHERE course_code = 'BSCS'";
-$result = $conn->query($query);
+$course_id = 'BSCS';
+$stmt = $conn->prepare("SELECT * FROM students WHERE course_id = ?");
+$stmt->bind_param("s", $course_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$students = $result->fetch_all(MYSQLI_ASSOC);
+
+$stmt->close();
+$conn->close();
+
+// Organize students by year level
+$students_by_year = [];
+foreach ($students as $student) {
+    $students_by_year[$student['year_level']][] = $student;
+}
+
+// Define the order of year levels
+$year_order = ['First Year', 'Second Year', 'Third Year', 'Fourth Year'];
+
+// Sort the students_by_year array based on the defined order
+$sorted_students_by_year = [];
+foreach ($year_order as $year) {
+    if (isset($students_by_year[$year])) {
+        $sorted_students_by_year[$year] = $students_by_year[$year];
+    }
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BSCS Enrollment Information</title>
+    <title>Students in <?= htmlspecialchars($course_id) ?></title>
     <link rel="stylesheet" href="styles.css">
     <style>
         body {
@@ -22,71 +43,68 @@ $result = $conn->query($query);
             background-color: #f4f4f4;
             padding: 20px;
         }
-        .container {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin: 20px 0;
         }
         th, td {
-            border: 1px solid #ccc;
-            padding: 10px;
+            border: 1px solid #ddd;
+            padding: 8px;
             text-align: left;
         }
         th {
             background-color: #007bff;
             color: white;
         }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
         #newStudentBtn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
             font-size: 16px;
-            background-color: #4CAF50; /* Green background */
-            color: white; /* White text */
-            border: none; /* No border */
-            padding: 10px 15px; /* Padding */
-            border-radius: 5px; /* Rounded corners */
-            cursor: pointer; /* Pointer cursor on hover */
-            float: right; /* Align to the right */
-            margin-bottom: 20px; /* Space below the button */
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <h2 style="display: inline-block;">BSCS Enrolled Information</h2>
-    <a id="newStudentBtn" href="Enrollment_form.php">+ New Student</a> <!-- Button outside the table but aligned with the heading -->
-
-    <?php
-    if ($result->num_rows > 0) {
-        echo '<table>';
-        echo '<tr>';
-        echo '<th>First Name</th>';
-        echo '<th>Middle Name</th>';
-        echo '<th>Last Name</th>';
-        echo '<th>Email</th>';
-        echo '<th>Contact</th>';
-        echo '</tr>';
-        while ($row = $result->fetch_assoc()) {
-            echo '<tr>';
-            echo '<td>' . htmlspecialchars($row['first_name']) . '</td>';
-            echo '<td>' . htmlspecialchars($row['middle_name']) . '</td>';
-            echo '<td>' . htmlspecialchars($row['last_name']) . '</td>';
-            echo '<td>' . htmlspecialchars($row['email']) . '</td>';
-            echo '<td>' . htmlspecialchars($row['contact']) . '</td>';
-            echo '</tr>';
-        }
-        echo '</table>';
-    } else {
-        echo '<p>No students enrolled in BSCS.</p>';
-    }
-    $conn->close();
-    ?>
+<h2>Students Enrolled in <?= htmlspecialchars($course_id) ?></h2>
+<div id="main">
+    <a id="newStudentBtn" href="Enrollment_form.php">+ New Student</a>
 </div>
+
+<?php if (!empty($sorted_students_by_year)): ?>
+    <?php foreach ($sorted_students_by_year as $year_level => $students): ?>
+        <h3><?= htmlspecialchars($year_level) ?> Students</h3>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Contact</th>
+            </tr>
+            <?php foreach ($students as $student): ?>
+                <tr>
+                    <td>
+                        <a href="student_deatails.php?id=<?= $student['id'] ?>">
+                            <?= htmlspecialchars($student['last_name']) ?>, <?= htmlspecialchars($student['first_name']) ?> <?= htmlspecialchars($student['middle_name']) ?>
+                        </a>
+                    </td>
+                    <td><?= htmlspecialchars($student['email']) ?></td>
+                    <td><?= htmlspecialchars($student['contact']) ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </table>
+    <?php endforeach; ?>
+<?php else: ?>
+    <p>No students enrolled in this course yet.</p>
+<?php endif; ?>
 
 </body>
 </html>

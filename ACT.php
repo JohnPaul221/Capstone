@@ -2,8 +2,8 @@
 global $conn;
 session_start();
 require_once 'Config/Database.php';
+$course_id = 'ACT';
 
-$course_id = 'BSAIS';
 $stmt = $conn->prepare("SELECT * FROM students WHERE course_id = ?");
 $stmt->bind_param("s", $course_id);
 $stmt->execute();
@@ -43,13 +43,6 @@ $conn->close();
         tr:nth-child(even) {
             background-color: #f2f2f2;
         }
-        a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
     </style>
 </head>
 <body>
@@ -78,6 +71,5 @@ $conn->close();
     <p>No students enrolled in this course yet.</p>
 <?php endif; ?>
 
-<a href="index.php">Back to Enrollment</a>
 </body>
 </html>
