@@ -11,35 +11,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $contact = $_POST['contact'];
     $course_id = $_POST['course'];
     $year_level = $_POST['year_level']; // Capture year level
+    $selected_subjects = $_POST['subjects'] ?? []; // Capture selected subjects
 
     $allowed_courses = ['BSCS', 'BSENTREP', 'BSAIS', 'ACT'];
     if (!in_array($course_id, $allowed_courses)) {
         die("Invalid course");
     }
 
-    // Update SQL query to exclude academic_year
-    $stmt = $conn->prepare("INSERT INTO students (first_name, middle_name, last_name, email, contact, course_id, year_level) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssssss", $first_name, $middle_name, $last_name, $email, $contact, $course_id, $year_level);
+    // Convert selected subjects to JSON
+    $selected_subjects_json = json_encode($selected_subjects);
+
+    // Check for JSON encoding errors
+    if ($selected_subjects_json === false) {
+        die("JSON encoding error: " . json_last_error_msg());
+    }
+
+    $stmt = $conn->prepare("INSERT INTO students (first_name, middle_name, last_name, email, contact, course_id, year_level, selected_subjects) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssssss", $first_name, $middle_name, $last_name, $email, $contact, $course_id, $year_level, $selected_subjects_json);
 
     if ($stmt->execute()) {
         $_SESSION['success_message'] = "Enrollment successful!";
-        switch ($course_id) {
-            case 'BSCS':
-                header("Location: BSCS.php");
-                break;
-            case 'BSENTREP':
-                header("Location: BSENTREP.php");
-                break;
-            case 'BSAIS':
-                header("Location: BSAIS.php");
-                break;
-            case 'ACT':
-                header("Location: ACT.php");
-                break;
-            default:
-                header("Location: index.php");
-                break;
-        }
+        header("Location: student_details.php?id=" . $conn->insert_id); // Redirect to student details page
         exit();
     } else {
         $_SESSION['error_message'] = "Error: " . $stmt->error;
@@ -47,8 +39,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $stmt->close();
     $conn->close();
-    header("Location: " . $_SERVER['PHP_SELF']);
-    exit();
 }
 ?>
 
@@ -105,6 +95,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             margin-bottom: 20px;
             color: green;
         }
+        .subject-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .subject-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #ddd;
+        }
     </style>
 </head>
 <body>
@@ -122,7 +120,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         unset($_SESSION['error_message']);
     }
     ?>
-
     <form action="" method="POST">
         <input type="text" name="first_name" placeholder="First Name:" required>
         <input type="text" name="middle_name" placeholder="Middle Name:" required>
@@ -146,9 +143,73 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <option value="ACT">Associate in Computer Technology (ACT)</option>
         </select>
 
+        <div id="subjects-display"></div>
+        <input type="hidden" name="subjects" id="selected-subjects" value="">
         <button type="submit">Enroll</button>
     </form>
 </div>
+<script>
+    const subjectsByCourse = {
+        'BSCS': {
+            'First Year': [
+                { name: 'Euthenics 2', price: 1500 },
+                { name: 'Computer Programming 2 (Lab)', price: 1200 },
+                { name: 'Computer Programming 2 (Lec)', price: 1000 },
+                { name: 'Math in the Modern World', price: 1800 },
+                { name: 'National Service Training Program 2', price: 800 },
+                { name: 'PATHFIT 2', price: 3000 },
+                { name: 'Ethics', price: 4000},
+                { name: 'Discrete Structure 1', price: 3000},
+            ],
+            'Second Year': [
+                { name: 'Data Communication and Networking 2', price: 3000 }
+            ]
+        },
+        // Add other courses similarly...
+    };
+
+    const yearSelect = document.querySelector('select[name="year_level"]');
+    const courseSelect = document.querySelector('select[name="course"]');
+    const subjectsDiv = document.getElementById('subjects-display');
+    const selectedSubjectsInput = document.getElementById('selected-subjects');
+
+    function updateSubjectsDisplay() {
+        const selectedCourse = courseSelect.value;
+        const selectedYear = yearSelect.value;
+
+        if (selectedCourse && selectedYear) {
+            const subjects = subjectsByCourse[selectedCourse]?.[selectedYear] || [];
+            subjectsDiv.innerHTML = `
+                <h4>Subjects for ${selectedYear} (${selectedCourse}):</h4>
+                <ul class="subject-list">
+                    ${subjects.map((subject, index) => `
+                        <li>
+                            <input type="checkbox" id="subject-${index}" value="${subject.name}" onchange="updateSelectedSubjects()">
+                            <label for="subject-${index}">${subject.name}</label>
+                        </li>
+                    `).join('')}
+                </ul>
+            `;
+        } else {
+            subjectsDiv.innerHTML = '';
+        }
+    }
+
+    function updateSelectedSubjects() {
+        const checkboxes = subjectsDiv.querySelectorAll('input[type="checkbox"]');
+        const selectedSubjects = [];
+
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                selectedSubjects.push(checkbox.value);
+            }
+        });
+
+        selectedSubjectsInput.value = JSON.stringify(selectedSubjects);
+    }
+    yearSelect.addEventListener('change', updateSubjectsDisplay);
+    courseSelect.addEventListener('change', updateSubjectsDisplay);
+</script>
 
 </body>
 </html>

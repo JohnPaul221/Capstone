@@ -12,17 +12,12 @@ $students = $result->fetch_all(MYSQLI_ASSOC);
 
 $stmt->close();
 $conn->close();
-
-// Organize students by year level
 $students_by_year = [];
 foreach ($students as $student) {
     $students_by_year[$student['year_level']][] = $student;
 }
-
-// Define the order of year levels
 $year_order = ['First Year', 'Second Year', 'Third Year', 'Fourth Year'];
 
-// Sort the students_by_year array based on the defined order
 $sorted_students_by_year = [];
 foreach ($year_order as $year) {
     if (isset($students_by_year[$year])) {
@@ -92,7 +87,7 @@ foreach ($year_order as $year) {
             <?php foreach ($students as $student): ?>
                 <tr>
                     <td>
-                        <a href="student_deatails.php?id=<?= $student['id'] ?>">
+                        <a href="student_details.php?id=<?= $student['id'] ?>">
                             <?= htmlspecialchars($student['last_name']) ?>, <?= htmlspecialchars($student['first_name']) ?> <?= htmlspecialchars($student['middle_name']) ?>
                         </a>
                     </td>

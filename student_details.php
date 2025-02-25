@@ -7,7 +7,6 @@ if (!isset($_GET['id'])) {
     die("Student ID not provided.");
 }
 
-
 $student_id = $_GET['id'];
 $stmt = $conn->prepare("SELECT * FROM students WHERE id = ?");
 $stmt->bind_param("i", $student_id);
@@ -19,6 +18,16 @@ if ($result->num_rows === 0) {
 }
 $student = $result->fetch_assoc();
 $course_id = $student['course_id'];
+
+// Decode selected subjects
+$selected_subjects = json_decode($student['selected_subjects'], true);
+
+// Check if decoding was successful
+if (json_last_error() !== JSON_ERROR_NONE) {
+    // Handle JSON error
+    echo "Error decoding JSON: " . json_last_error_msg();
+    $selected_subjects = []; // Set to empty array to avoid foreach error
+}
 
 $stmt->close();
 $conn->close();
@@ -89,7 +98,22 @@ $conn->close();
         <label>Course ID:</label> <?= htmlspecialchars($student['course_id']) ?>
     </div>
     <div class="detail">
+        <label>Year Level:</label> <?= htmlspecialchars($student['year_level']) ?>
+    </div>
+    <div class="detail">
         <label>Enrollment Date:</label> <?= htmlspecialchars($student['created_at']) ?>
+    </div>
+    <div class="detail">
+        <label>Selected Subjects:</label>
+        <?php if (is_array($selected_subjects) && !empty($selected_subjects)): ?>
+            <ul>
+                <?php foreach ($selected_subjects as $subject): ?>
+                    <li><?= htmlspecialchars($subject) ?></li>
+                <?php endforeach; ?>
+            </ul>
+        <?php else: ?>
+            <p>No subjects selected.</p>
+        <?php endif; ?>
     </div>
     <a href="<?= strtolower($course_id) ?>.php?course=<?= urlencode($course_id) ?>" class="button">Back to Student List</a>
     <a href="javascript:window.print();" class="button">Print Details</a>

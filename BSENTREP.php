@@ -58,7 +58,7 @@ $conn->close();
         <?php foreach ($students as $student): ?>
             <tr>
                 <td>
-                    <a href="student_deatails.php?id=<?= $student['id'] ?>">
+                    <a href="student_details.php?id=<?= $student['id'] ?>">
                         <?= htmlspecialchars($student['last_name']) ?>, <?= htmlspecialchars($student['first_name']) ?> <?= htmlspecialchars($student['middle_name']) ?>
                     </a>
                 </td>
