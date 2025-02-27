@@ -25,23 +25,63 @@ $conn->close();
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             padding: 20px;
+            color: #333;
+        }
+        h2 {
+            text-align: center;
+            color: #ff0000; /* Red color for the heading */
+            margin-bottom: 20px;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 12px;
             text-align: left;
         }
         th {
-            background-color: #007bff;
+            background-color: #007bff; /* Blue background for header */
             color: white;
+            font-weight: bold;
         }
         tr:nth-child(even) {
-            background-color: #f2f2f2;
+            background-color: #f2f2f2; /* Light gray for even rows */
+        }
+        tr:hover {
+            background-color: #e9ecef; /* Light gray on hover */
+        }
+        a {
+            text-decoration: none;
+            color: #007bff; /* Blue color for links */
+            transition: color 0.3s;
+        }
+        a:hover {
+            color: #ff0000; /* Red color on link hover */
+        }
+        .no-students {
+            text-align: center;
+            font-size: 18px;
+            color: #ff0000; /* Red color for no students message */
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #007bff; /* Blue button */
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .back-link:hover {
+            background-color: #0056b3; /* Darker blue on hover */
         }
     </style>
 </head>
@@ -68,9 +108,9 @@ $conn->close();
         <?php endforeach; ?>
     </table>
 <?php else: ?>
-    < <p>No students enrolled in this course yet.</p>
+    <p class="no-students">No students enrolled in this course yet.</p>
 <?php endif; ?>
 
-<a href="dashboard.php">Back to Enrollment</a>
+<a href="dashboard.php" class="back-link">Back to Enrollment</a>
 </body>
 </html>
