@@ -29,7 +29,7 @@ $conn->close();
         }
         h2 {
             text-align: center;
-            color: #ff0000; /* Red color for the heading */
+            color: #ff0000;
             margin-bottom: 20px;
         }
         table {
@@ -46,42 +46,42 @@ $conn->close();
             text-align: left;
         }
         th {
-            background-color: #007bff; /* Blue background for header */
+            background-color: #007bff;
             color: white;
             font-weight: bold;
         }
         tr:nth-child(even) {
-            background-color: #f2f2f2; /* Light gray for even rows */
+            background-color: #f2f2f2;
         }
         tr:hover {
-            background-color: #e9ecef; /* Light gray on hover */
+            background-color: #e9ecef;
         }
         a {
             text-decoration: none;
-            color: #007bff; /* Blue color for links */
+            color: #007bff;
             transition: color 0.3s;
         }
         a:hover {
-            color: #ff0000; /* Red color on link hover */
+            color: #ff0000;
         }
         .no-students {
             text-align: center;
             font-size: 18px;
-            color: #ff0000; /* Red color for no students message */
+            color: #ff0000;
         }
         .back-link {
             display: block;
             text-align: center;
             margin-top: 20px;
             padding: 10px;
-            background-color: #007bff; /* Blue button */
+            background-color: #007bff;
             color: white;
             border-radius: 5px;
             text-decoration: none;
             transition: background-color 0.3s;
         }
         .back-link:hover {
-            background-color: #0056b3; /* Darker blue on hover */
+            background-color: #0056b3;
         }
     </style>
 </head>
