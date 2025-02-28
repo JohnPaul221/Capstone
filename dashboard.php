@@ -16,12 +16,10 @@ require_once 'Config/Database.php';
             padding: 0;
             background-color: #f4f4f4;
         }
-
         #main {
             padding: 20px;
             transition: margin-left 0.3s ease;
         }
-
         .sidebar {
             display: none;
             height: 100%;
@@ -35,26 +33,21 @@ require_once 'Config/Database.php';
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
             padding: 20px;
         }
-
         .sidebar.open {
             display: block;
             left: 0;
         }
-
         .sidebar h2 {
             margin-top: 0;
             color: #333;
         }
-
         .sidebar ul {
             list-style: none;
             padding: 0;
         }
-
         .sidebar li {
             margin: 10px 0;
         }
-
         .sidebar a {
             background-color: #f7f7f7;
             text-decoration: none;
@@ -66,16 +59,13 @@ require_once 'Config/Database.php';
             transition: background-color 0.3s ease;
             border: 1px solid transparent;
         }
-
         .sidebar a:hover {
             background-color: #eaeaea;
             color: #000;
         }
-
         .sidebar a i {
             margin-right: 10px;
         }
-
         #openBtn {
             margin: 20px;
             font-size: 24px;
@@ -84,7 +74,6 @@ require_once 'Config/Database.php';
             color: #111;
             cursor: pointer;
         }
-
         #closeBtn {
             background: none;
             border: none;
@@ -95,7 +84,6 @@ require_once 'Config/Database.php';
             right: 15px;
             font-size: 24px;
         }
-
         #newStudentBtn {
             position: absolute;
             top: 20px;

@@ -83,19 +83,16 @@ require_once 'Config/Database.php';
     </style>
 </head>
 <body>
-
 <div class="header">
     <img src="upload/aclc_logo.png" alt="ACLC Logo">
     <h1>ACLC College Admin</h1>
 </div>
-
 <div class="login-container">
     <form action="login.php" method="POST">
         <input type="text" name="username" placeholder="Username" required>
         <input type="password" name="password" placeholder="Password" required>
         <button type="submit">Login</button>
     </form>
-
     <?php
     $valid_username = "admin";
     $valid_password = "admin1";
@@ -115,6 +112,5 @@ require_once 'Config/Database.php';
     }
     ?>
 </div>
-
 </body>
 </html>

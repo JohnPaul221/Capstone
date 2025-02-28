@@ -1,15 +1,17 @@
 <?php
 global $conn;
-session_start();
 require_once 'Config/Database.php';
-
+session_start();
 $course_id = 'BSCS';
+if (isset($_GET['course_id'])) {
+    $course_id = $_GET['course_id'];
+}
+
 $stmt = $conn->prepare("SELECT * FROM students WHERE course_id = ?");
 $stmt->bind_param("s", $course_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $students = $result->fetch_all(MYSQLI_ASSOC);
-
 $stmt->close();
 $conn->close();
 $students_by_year = [];
@@ -17,7 +19,6 @@ foreach ($students as $student) {
     $students_by_year[$student['year_level']][] = $student;
 }
 $year_order = ['First Year', 'Second Year', 'Third Year', 'Fourth Year'];
-
 $sorted_students_by_year = [];
 foreach ($year_order as $year) {
     if (isset($students_by_year[$year])) {
@@ -25,18 +26,100 @@ foreach ($year_order as $year) {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Students in <?= htmlspecialchars($course_id) ?></title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         body {
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
             background-color: #f4f4f4;
+        }
+        #main {
             padding: 20px;
+            transition: margin-left 0.3s ease;
+        }
+        .sidebar {
+            display: none;
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: -250px;
+            background-color: #ffffff;
+            color: black;
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+        }
+        .sidebar.open {
+            display: block;
+            left: 0;
+        }
+        .sidebar h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar li {
+            margin: 10px 0;
+        }
+        .sidebar a {
+            background-color: #f7f7f7;
+            text-decoration: none;
+            color: #555;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            border: 1px solid transparent;
+        }
+        .sidebar a:hover {
+            background-color: #eaeaea;
+            color: #000;
+        }
+        .sidebar a i {
+            margin-right: 10px;
+        }
+        #openBtn {
+            margin: 20px;
+            font-size: 24px;
+            background: none;
+            border: none;
+            color: #111;
+            cursor: pointer;
+        }
+        #closeBtn {
+            background: none;
+            border: none;
+            color: #111;
+            cursor: pointer;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+        }
+        #newStudentBtn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
         }
         table {
             width: 100%;
@@ -55,51 +138,63 @@ foreach ($year_order as $year) {
         tr:nth-child(even) {
             background-color: #f2f2f2;
         }
-        #newStudentBtn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 16px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
+        .sidebar.open + #main {
+            margin-left: 300px;
         }
     </style>
 </head>
 <body>
-<h2>Students Enrolled in <?= htmlspecialchars($course_id) ?></h2>
-<div id="main">
-    <a id="newStudentBtn" href="Enrollment_form.php">+ New Student</a>
+<div id="sidebar" class="sidebar">
+    <button id="closeBtn"><i class="fa-solid fa-xmark"></i></button>
+    <h2>Menu</h2>
+    <ul>
+        <li><a href="?course_id=BSCS">BSCS</a></li>
+        <li><a href="?course_id=BSENTREP">BSENTEP</a></li>
+        <li><a href="?course_id=BSAIS">BSAIS</a></li>
+        <li><a href="?course_id=ACT">ACT</a></li>
+    </ul>
 </div>
-
-<?php if (!empty($sorted_students_by_year)): ?>
-    <?php foreach ($sorted_students_by_year as $year_level => $students): ?>
-        <h3><?= htmlspecialchars($year_level) ?> Students</h3>
-        <table>
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Contact</th>
-            </tr>
-            <?php foreach ($students as $student): ?>
+<div id="main">
+    <button id="openBtn"><i class="fa-solid fa-bars"></i></button>
+    <a id="newStudentBtn" href="Enrollment_form.php">+ New Student</a>
+    <h2>Students Enrolled in <?= htmlspecialchars($course_id) ?></h2>
+    <?php if (!empty($sorted_students_by_year)): ?>
+        <?php foreach ($sorted_students_by_year as $year_level => $students): ?>
+            <h3><?= htmlspecialchars($year_level) ?> Students</h3>
+            <table>
                 <tr>
-                    <td>
-                        <a href="student_details.php?id=<?= $student['id'] ?>">
-                            <?= htmlspecialchars($student['last_name']) ?>, <?= htmlspecialchars($student['first_name']) ?> <?= htmlspecialchars($student['middle_name']) ?>
-                        </a>
-                    </td>
-                    <td><?= htmlspecialchars($student['email']) ?></td>
-                    <td><?= htmlspecialchars($student['contact']) ?></td>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Contact</th>
                 </tr>
-            <?php endforeach; ?>
-        </table>
-    <?php endforeach; ?>
-<?php else: ?>
-    <p>No students enrolled in this course yet.</p>
-<?php endif; ?>
-
+                <?php foreach ($students as $student): ?>
+                    <tr>
+                        <td>
+                            <a href="student_details.php?id=<?= $student['id'] ?>">
+                                <?= htmlspecialchars($student['last_name']) ?>, <?= htmlspecialchars($student['first_name']) ?> <?= htmlspecialchars($student['middle_name']) ?>
+                            </a>
+                        </td>
+                        <td><?= htmlspecialchars($student['email']) ?></td>
+                        <td><?= htmlspecialchars($student['contact']) ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </table>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <p>No students enrolled in this course yet.</p>
+    <?php endif; ?>
+</div>
+<script>
+    document.getElementById("openBtn").onclick = function() {
+        const sidebar = document.getElementById("sidebar");
+        sidebar.classList.add("open");
+        sidebar.style.display = "block";
+    };
+    document.getElementById("closeBtn").onclick = function() {
+        const sidebar = document.getElementById("sidebar");
+        sidebar.classList.remove("open");
+        sidebar.style.display = "none";
+    };
+</script>
 </body>
 </html>

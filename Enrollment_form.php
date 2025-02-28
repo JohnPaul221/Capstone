@@ -1,9 +1,7 @@
 <?php
 session_start();
 require_once 'Config/Database.php';
-
 global $conn;
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $first_name = $_POST['first_name'];
     $middle_name = $_POST['middle_name'];
@@ -14,20 +12,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $year_level = $_POST['year_level'];
     $selected_subjects = $_POST['subjects'] ?? [];
     $payment_upon_enrollment = $_POST['payment_upon_enrollment'] ?? 0;
-
     $allowed_courses = ['BSCS', 'BSENTREP', 'BSAIS', 'ACT'];
     if (!in_array($course_id, $allowed_courses)) {
         $_SESSION['error_message'] = "Invalid course.";
         header("Location: error_page.php");
         exit();
     }
-
-    // Convert selected subjects to a comma-separated string
     $selected_subjects_string = implode(',', $selected_subjects);
-
     $stmt = $conn->prepare("INSERT INTO students (first_name, middle_name, last_name, email, contact, course_id, year_level, selected_subjects, upon_enrollment) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("sssssssss", $first_name, $middle_name, $last_name, $email, $contact, $course_id, $year_level, $selected_subjects_string, $payment_upon_enrollment);
-
     if ($stmt->execute()) {
         $_SESSION['success_message'] = "Enrollment successful!";
         header("Location: student_details.php?id=" . $conn->insert_id);
@@ -35,12 +28,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         $_SESSION['error_message'] = "Error: " . $stmt->error;
     }
-
     $stmt->close();
     $conn->close();
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -150,10 +141,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 </head>
 <body>
-
 <div class="enrollment-container">
     <h2>Enrollment Form</h2>
-
     <?php
     if (isset($_SESSION['success_message'])) {
         echo '<div class="message success">' . $_SESSION['success_message'] . '</div>';
@@ -164,14 +153,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         unset($_SESSION['error_message']);
     }
     ?>
-
     <form action="" method="POST">
         <input type="text" name="first_name" placeholder="First Name:" required>
         <input type="text" name="middle_name" placeholder="Middle Name:" required>
         <input type="text" name="last_name" placeholder="Last Name:" required>
         <input type="email" name="email" placeholder="Email:" required>
         <input type="text" name="contact" placeholder="Contact Number:" required>
-
         <select name="year_level" required>
             <option value="" disabled selected>Select Year Level:</option>
             <option value="First Year">First Year</option>
@@ -179,7 +166,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <option value="Third Year">Third Year</option>
             <option value="Fourth Year">Fourth Year</option>
         </select>
-
         <select name="course" required>
             <option value="" disabled selected>Select Course:</option>
             <option value="BSCS">BS Computer Science (BSCS)</option>
@@ -187,7 +173,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <option value="BSAIS">Bachelor of Science in Accounting Information System (BSAIS)</option>
             <option value="ACT">Associate in Computer Technology (ACT)</option>
         </select>
-
         <input type="number" name="payment_upon_enrollment" placeholder="Upon Enrollment (₱):" required min="0" step="0.01">
 
         <div id="subjects-display"></div>
@@ -195,7 +180,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <button type="submit">Enroll</button>
     </form>
 </div>
-
 <script>
     const subjectsByCourse = {
         'BSCS': {
@@ -213,7 +197,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 { name: 'Data Communication and Networking 2' }
             ]
         },
-        // Add other courses and their subjects here
+        // Add other courses
     };
 
     const yearSelect = document.querySelector('select[name="year_level"]');
@@ -242,7 +226,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             subjectsDiv.innerHTML = '';
         }
     }
-
     function updateSelectedSubjects() {
         const checkboxes = subjectsDiv.querySelectorAll('input[type="checkbox"]');
         const selectedSubjects = [];
@@ -254,7 +237,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         });
         selectedSubjectsInput.value = selectedSubjects.join(',');
     }
-
     yearSelect.addEventListener('change', updateSubjectsDisplay);
     courseSelect.addEventListener('change', updateSubjectsDisplay);
 </script>
