@@ -2,9 +2,11 @@
 session_start();
 require_once 'Config/Database.php';
 global $conn;
+
 if (!isset($_GET['id'])) {
     die("Student ID not provided.");
 }
+
 $student_id = intval($_GET['id']);
 $stmt = $conn->prepare("SELECT * FROM students WHERE id = ?");
 $stmt->bind_param("i", $student_id);
@@ -14,6 +16,7 @@ $result = $stmt->get_result();
 if ($result->num_rows === 0) {
     die("Student not found.");
 }
+
 $student = $result->fetch_assoc();
 $course_id = $student['course_id'];
 $subjectFees = [
@@ -27,6 +30,7 @@ $subjectFees = [
     'Discrete Structure 1' => 3000,
     'Data Communication and Networking 2' => 3000,
 ];
+
 function calculateTotalFees($selectedSubjects, $subjectFees) {
     $total = 0;
     foreach ($selectedSubjects as $subject) {
@@ -37,6 +41,7 @@ function calculateTotalFees($selectedSubjects, $subjectFees) {
     }
     return $total;
 }
+
 $submitted_tuition = 0;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tuition'])) {
     $tuition_amount = floatval($_POST['tuition']);
@@ -49,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tuition'])) {
         exit();
     }
 }
+
 $stmt_payments = $conn->prepare("SELECT amount FROM tuition_payment WHERE student_id = ?");
 $stmt_payments->bind_param("i", $student_id);
 $stmt_payments->execute();
@@ -60,6 +66,7 @@ while ($row = $result_payments->fetch_assoc()) {
 $stmt->close();
 $stmt_payments->close();
 $conn->close();
+
 $selected_subjects = $student['selected_subjects'];
 $payment_upon_enrollment = $student['upon_enrollment'];
 $totalFees = calculateTotalFees(explode(',', $selected_subjects), $subjectFees);
@@ -138,6 +145,23 @@ $remainingBalance = $totalFees - $totalPayments;
         .button-container {
             display: flex;
             justify-content: space-between;
+        }
+
+        @media print {
+            @page {
+                size: landscape; 
+            }
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                max-width: 100%;
+            }
+            .button {
+                display: none;
+            }
         }
     </style>
     <script>
