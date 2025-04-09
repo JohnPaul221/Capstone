@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'Config/Database.php';
+require_once 'Config/Database.php'; // Ensure this file connects to your database
 global $conn;
 
 if (!isset($_GET['id'])) {
@@ -125,7 +125,7 @@ $remainingBalance = $totalFees - $totalPayments;
             color: white;
             border: none;
             border-radius: 5px;
-            padding: 10px;
+            padding:  10px;
             cursor: pointer;
             width: 48%;
             margin-top: 10px;
@@ -149,7 +149,7 @@ $remainingBalance = $totalFees - $totalPayments;
 
         @media print {
             @page {
-                size: landscape; 
+                size: landscape;
             }
             body {
                 margin: 0;
@@ -242,7 +242,7 @@ $remainingBalance = $totalFees - $totalPayments;
     </div>
     <div class="detail button-container">
         <a href="<?= htmlspecialchars(strtolower($course_id)) ?>.php?course_id=<?= htmlspecialchars($course_id) ?>" class="button">Back to <?= htmlspecialchars($course_id) ?> Students</a>
-        <button class="button print-button" onclick="printPage()">Print Details</button>
+        <a href="reciept.php?id=<?= htmlspecialchars($student_id) ?>" class="button print-button">Print Receipt</a>
     </div>
 </div>
 </body>

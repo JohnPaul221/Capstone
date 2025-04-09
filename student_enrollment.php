@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'Config/Database.php';
+require_once 'Config/Database.php'; // Ensure this file connects to your database
 global $conn;
 
 $success_message = '';
@@ -216,7 +216,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 { name: 'Data Communication and Networking 2' }
             ]
         },
-        // Add other courses and their subjects here
+        'BSENTREP': {
+            'First Year': [
+                { name: 'Introduction to Entrepreneurship' },
+                { name: 'Business Mathematics' },
+                { name: 'Fundamentals of Marketing' },
+                { name: 'Business Communication' },
+            ],
+            'Second Year': [
+                { name: 'Entrepreneurial Finance' },
+                { name: 'Operations Management' }
+            ]
+        },
+        'BSAIS': {
+            'First Year': [
+                { name: 'Introduction to Accounting' },
+                { name: 'Business Law' },
+                { name: 'Financial Management' },
+            ],
+            'Second Year': [
+                { name: 'Cost Accounting' },
+                { name: 'Management Accounting' }
+            ]
+        },
+        'ACT': {
+            'First Year': [
+                { name: 'Computer Fundamentals' },
+                { name: 'Introduction to Programming' },
+            ],
+            'Second Year': [
+                { name: 'Web Development' },
+                { name: 'Database Management' }
+            ]
+        }
     };
 
     const yearSelect = document.querySelector('select[name="year_level"]');
@@ -263,11 +295,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     function closeSubjects() {
-        if (subjectsDiv.style.display === 'block') {
-            subjectsDiv.style.display = 'none';
-        } else {
-            subjectsDiv.style.display = 'block';
-        }
+        subjectsDiv.style.display = 'none';
     }
 
     yearSelect.addEventListener('change', updateSubjectsDisplay);

@@ -104,7 +104,7 @@ require_once 'Config/Database.php';
         $password = $_POST['password'];
 
         if ($username === $valid_username && $password === $valid_password) {
-            header("Location: dashboard.php");
+            header("Location: home.php");
             exit();
         } else {
             echo "<p class='error'>Invalid username or password.</p>";
