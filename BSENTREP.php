@@ -143,7 +143,7 @@ foreach ($year_order as $year) {
     </style>
 </head>
 <body>
-<div id="sidebar" class="sidebar">
+<div id="sidebar" class="sidebar" aria-hidden="true">
     <button id="closeBtn"><i class="fa-solid fa-xmark"></i></button>
     <h2>Menu</h2>
     <ul>
@@ -184,15 +184,27 @@ foreach ($year_order as $year) {
     <?php endif; ?>
 </div>
 <script>
+    function adjustMainContent(isOpen) {
+        const mainContent = document.getElementById("main");
+        if (isOpen) {
+            mainContent.style.marginLeft = "250px"; // Adjust margin when sidebar is open
+        } else {
+            mainContent.style.marginLeft = "0"; // Reset margin when sidebar is closed
+        }
+    }
+
     document.getElementById("openBtn").onclick = function() {
         const sidebar = document.getElementById("sidebar");
         sidebar.classList.add("open");
         sidebar.style.display = "block";
+        adjustMainContent(true); // Call function to adjust main content
     };
+
     document.getElementById("closeBtn").onclick = function() {
         const sidebar = document.getElementById("sidebar");
         sidebar.classList.remove("open");
         sidebar.style.display = "none";
+        adjustMainContent(false); // Call function to reset main content
     };
 </script>
 </body>

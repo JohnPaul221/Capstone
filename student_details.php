@@ -18,6 +18,7 @@ if ($result->num_rows === 0) {
 }
 
 $student = $result->fetch_assoc();
+$created_at = $student['created_at']; // Fetch the created_at date
 $course_id = $student['course_id'];
 $subjectFees = [
     'Euthenics 2' => 1500,
@@ -46,22 +47,32 @@ $submitted_tuition = 0;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tuition'])) {
     $tuition_amount = floatval($_POST['tuition']);
     if ($tuition_amount > 0) {
-        $stmt_payment = $conn->prepare("INSERT INTO tuition_payment (student_id, amount) VALUES (?, ?)");
-        $stmt_payment->bind_param("id", $student_id, $tuition_amount);
+        $current_date = date('Y-m-d H:i:s'); // Fetch the current date and time
+        $stmt_payment = $conn->prepare("INSERT INTO tuition_payment (student_id, amount, payment_date) VALUES (?, ?, ?)");
+        $stmt_payment->bind_param("ids", $student_id, $tuition_amount, $current_date); // Bind the current date
         $stmt_payment->execute();
         $stmt_payment->close();
+
+        // Update the payment upon enrollment if it hasn't been set yet
+        if (empty($student['enrollment_date'])) {
+            $stmt_update = $conn->prepare("UPDATE students SET upon_enrollment = ?, enrollment_date = ? WHERE id = ?");
+            $stmt_update->bind_param("dsi", $tuition_amount, $current_date, $student_id);
+            $stmt_update->execute();
+            $stmt_update->close();
+        }
+
         header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . $student_id);
         exit();
     }
 }
 
-$stmt_payments = $conn->prepare("SELECT amount FROM tuition_payment WHERE student_id = ?");
+$stmt_payments = $conn->prepare("SELECT amount, payment_date FROM tuition_payment WHERE student_id = ?");
 $stmt_payments->bind_param("i", $student_id);
 $stmt_payments->execute();
 $result_payments = $stmt_payments->get_result();
 $tuition_payments = [];
 while ($row = $result_payments->fetch_assoc()) {
-    $tuition_payments[] = $row['amount'];
+    $tuition_payments[] = $row; // Store both amount and date
 }
 $stmt->close();
 $stmt_payments->close();
@@ -70,7 +81,7 @@ $conn->close();
 $selected_subjects = $student['selected_subjects'];
 $payment_upon_enrollment = $student['upon_enrollment'];
 $totalFees = calculateTotalFees(explode(',', $selected_subjects), $subjectFees);
-$totalPayments = array_sum($tuition_payments) + $payment_upon_enrollment;
+$totalPayments = array_sum(array_column($tuition_payments, 'amount')) + $payment_upon_enrollment;
 $remainingBalance = $totalFees - $totalPayments;
 ?>
 
@@ -85,14 +96,19 @@ $remainingBalance = $totalFees - $totalPayments;
             background-color: #f4f4f4;
             margin: 0;
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        .container {
+        .page {
             background: white;
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            margin: auto;
+            width: 100%;
+            max-width: 800px;
+            margin: 20px 0;
+            page-break-after: always; /* Forces a page break after each page */
         }
         h2 {
             text-align: center;
@@ -125,43 +141,23 @@ $remainingBalance = $totalFees - $totalPayments;
             color: white;
             border: none;
             border-radius: 5px;
-            padding:  10px;
+            padding: 10px;
             cursor: pointer;
-            width: 48%;
-            margin-top: 10px;
             text-align: center;
             text-decoration: none;
             display: inline-block;
+            margin-top: 10px;
         }
         .button:hover {
             background-color: #0056b3;
         }
-        .print-button {
-            background-color: #007bff;
-        }
-        .print-button:hover {
-            background-color: #218838;
+        .right-align {
+            text-align: right; /* Aligns text to the right */
         }
         .button-container {
             display: flex;
             justify-content: space-between;
-        }
-
-        @media print {
-            @page {
-                size: landscape;
-            }
-            body {
-                margin: 0;
-                padding: 0;
-            }
-            .container {
-                box-shadow: none;
-                max-width: 100%;
-            }
-            .button {
-                display: none;
-            }
+            margin-top: 20px;
         }
     </style>
     <script>
@@ -171,7 +167,9 @@ $remainingBalance = $totalFees - $totalPayments;
     </script>
 </head>
 <body>
-<div class="container">
+
+<!-- Page 1: Student Details -->
+<div class="page">
     <h2>Student Details</h2>
     <div class="detail">
         <label>Name:</label> <?= htmlspecialchars($student['first_name']) ?> <?= htmlspecialchars($student['middle_name']) ?> <?= htmlspecialchars($student['last_name']) ?>
@@ -189,8 +187,13 @@ $remainingBalance = $totalFees - $totalPayments;
         <label>Year Level:</label> <?= htmlspecialchars($student['year_level']) ?>
     </div>
     <div class="detail">
-        <label>Enrollment Date:</label> <?= htmlspecialchars($student['created_at']) ?>
+        <label>Enrollment Date:</label> <?= htmlspecialchars($created_at) ?>
     </div>
+</div>
+
+<!-- Page 2: Subject Details -->
+<div class="page">
+    <h2>Subject Details</h2>
     <div class="detail">
         <label>Selected Subjects:</label>
         <table>
@@ -212,7 +215,6 @@ $remainingBalance = $totalFees - $totalPayments;
                     }
                 }
                 echo '<tr><td>Total Fees:</td><td>₱' . number_format($totalFees, 2) . '</td></tr>';
-                echo '<tr><td>Payment Upon Enrollment:</td><td>₱' . number_format($payment_upon_enrollment, 2) . '</td></tr>';
                 echo '<tr><td>Remaining Balance:</td><td>₱' . number_format($remainingBalance, 2) . '</td></tr>';
                 echo '<tr><td colspan="2">
                         <form method="POST" action="">
@@ -221,17 +223,24 @@ $remainingBalance = $totalFees - $totalPayments;
                             <button type="submit" class="button">Submit Payment</button>
                         </form>
                     </td></tr>';
-                echo '<tr><td colspan="2"><strong>Tuition Payment History:</strong></td></tr>';
+                echo '<tr><td colspan="2" style="text-align: left;"><strong>Tuition Payment History:</strong></td></tr>';
                 echo '<tr><td colspan="2">';
-                if (!empty($tuition_payments)) {
-                    echo '<ul>';
-                    foreach ($tuition_payments as $payment) {
-                        echo '<li>₱' . number_format($payment, 2) . '</li>';
-                    }
-                    echo '</ul>';
-                } else {
-                    echo 'No tuition payments recorded.';
+                echo '<table style="width: 100%;">';
+                echo '<thead><tr><th style="text-align: left;">Payment Amount</th><th class="right-align">Payment Date</th></tr></thead>';
+                echo '<tbody>';
+
+                // Include the payment upon enrollment in the history
+                if ($payment_upon_enrollment > 0) {
+                    echo '<tr><td>₱' . number_format($payment_upon_enrollment, 2) . '</td><td class="right-align">' . date('F j, Y', strtotime($created_at)) . '</td></tr>'; // Use created_at here
                 }
+                if (!empty($tuition_payments)) {
+                    foreach ($tuition_payments as $payment) {
+                        echo '<tr><td>₱' . number_format($payment['amount'], 2) . '</td><td class="right-align">' . date('F j, Y', strtotime($payment['payment_date'])) . '</td></tr>';
+                    }
+                } else {
+                    echo '<tr><td colspan="2">No tuition payments recorded.</td></tr>';
+                }
+                echo '</tbody></table>';
                 echo '</td></tr>';
             } else {
                 echo '<tr><td colspan="2">No subjects found.</td></tr>';
@@ -242,8 +251,9 @@ $remainingBalance = $totalFees - $totalPayments;
     </div>
     <div class="detail button-container">
         <a href="<?= htmlspecialchars(strtolower($course_id)) ?>.php?course_id=<?= htmlspecialchars($course_id) ?>" class="button">Back to <?= htmlspecialchars($course_id) ?> Students</a>
-        <a href="reciept.php?id=<?= htmlspecialchars($student_id) ?>" class="button print-button">Print Receipt</a>
+        <button class="button print-button" onclick="printPage()">Print Details</button>
     </div>
 </div>
+
 </body>
 </html>

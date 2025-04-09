@@ -160,10 +160,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <h2>Enrollment Form</h2>
     <?php
     if ($success_message) {
-        echo '<div class="message success">' . $success_message . '</div>';
+        echo '<div class="message success" id="message">' . $success_message . '</div>';
     }
     if ($error_message) {
-        echo '<div class="message error">' . $error_message . '</div>';
+        echo '<div class="message error" id="message">' . $error_message . '</div>';
     }
     ?>
     <form action="" method="POST">
@@ -300,6 +300,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     yearSelect.addEventListener('change', updateSubjectsDisplay);
     courseSelect.addEventListener('change', updateSubjectsDisplay);
+    function hideMessage() {
+        const message = document.getElementById('message');
+        if (message) {
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 3000);
+        }
+    }
+    hideMessage();
 </script>
 </body>
 </html>

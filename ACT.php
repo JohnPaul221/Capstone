@@ -3,21 +3,17 @@ global $conn;
 require_once 'Config/Database.php';
 session_start();
 
-$course_id = 'ACT';
+$course_id = 'BSAIS';
 if (isset($_GET['course_id'])) {
     $course_id = $_GET['course_id'];
 }
 
-if ($stmt = $conn->prepare("SELECT * FROM students WHERE course_id = ?")) {
-    $stmt->bind_param("s", $course_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $students = $result->fetch_all(MYSQLI_ASSOC);
-    $stmt->close();
-} else {
-    echo "Error preparing statement: " . $conn->error;
-}
-
+$stmt = $conn->prepare("SELECT * FROM students WHERE course_id = ?");
+$stmt->bind_param("s", $course_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$students = $result->fetch_all(MYSQLI_ASSOC);
+$stmt->close();
 $conn->close();
 
 $students_by_year = [];
@@ -188,15 +184,25 @@ foreach ($year_order as $year) {
     <?php endif; ?>
 </div>
 <script>
+    function adjustMainContent(isOpen) {
+        const mainContent = document.getElementById("main");
+        if (isOpen) {
+            mainContent.style.marginLeft = "250px";
+        } else {
+            mainContent.style.marginLeft = "0";
+        }
+    }
+
     document.getElementById("openBtn").onclick = function() {
         const sidebar = document.getElementById("sidebar");
         sidebar.classList.add("open");
-        document.getElementById("main").style.marginLeft = "250px";
+        adjustMainContent(true);
     };
+
     document.getElementById("closeBtn").onclick = function() {
         const sidebar = document.getElementById("sidebar");
         sidebar.classList.remove("open");
-        document.getElementById("main").style.marginLeft = "0";
+        adjustMainContent(false);
     };
 </script>
 </body>
