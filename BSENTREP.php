@@ -40,11 +40,12 @@ foreach ($year_order as $year) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         body {
-            background-color: #f8f9fa;
+            background-color: #e9ecef;
+            font-family: 'Arial', sans-serif;
             transition: margin-left 0.3s ease;
         }
         #main {
-            padding: 20px;
+            padding: 30px;
             transition: margin-left 0.3s ease;
         }
         .sidebar {
@@ -107,37 +108,37 @@ foreach ($year_order as $year) {
             right: 15px;
             font-size: 24px;
         }
-        #newStudentBtn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 16px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
         table {
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 12px;
             text-align: left;
         }
         th {
             background-color: #007bff;
             color: white;
+            font-weight: bold;
         }
         tr:nth-child(even) {
             background-color: #f2f2f2;
         }
-        .sidebar.open + #main {
-            margin-left: 300px;
+        tr:hover {
+            background-color: #d1ecf1;
+        }
+        h2, h3 {
+            color: #343a40;
+        }
+        .no-students {
+            text-align: center;
+            font-size: 18px;
+            color: #6c757d;
         }
     </style>
 </head>
@@ -155,7 +156,6 @@ foreach ($year_order as $year) {
 </div>
 <div id="main">
     <button id="openBtn"><i class="fa-solid fa-bars"></i></button>
-    <a id="newStudentBtn" href="student_enrollment.php">+ New Student</a>
     <h2>Students Enrolled in <?= htmlspecialchars($course_id) ?></h2>
     <?php if (!empty($sorted_students_by_year)): ?>
         <?php foreach ($sorted_students_by_year as $year_level => $students): ?>
@@ -180,7 +180,7 @@ foreach ($year_order as $year) {
             </table>
         <?php endforeach; ?>
     <?php else: ?>
-        <p>No students enrolled in this course yet.</p>
+        <p class="no-students">No students enrolled in this course yet.</p>
     <?php endif; ?>
 </div>
 <script>

@@ -87,17 +87,17 @@ $remainingBalance = $totalFees - $totalPayments;
             display: flex;
             flex-direction: row;
             justify-content: space-between;
-            width: 500px; /* Adjusted width if necessary */
-            height: auto; /* Adjusted height to auto */
+            width: 700px;
+            height: auto;
             border: 1px solid #000;
             padding: 10px;
             box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-            gap: 0; /* Ensure no gap between invoices */
+            gap: 0;
         }
         .invoice {
-            width: 50%; /* Each invoice takes half the width */
+            width: 50%;
             padding: 5px;
-            margin: 0; /* Removed margin to eliminate space */
+            margin: 0;
             overflow: hidden;
         }
         .invoice-table {
@@ -128,7 +128,7 @@ $remainingBalance = $totalFees - $totalPayments;
             background-color: #f2f2f2;
         }
         .invoice-header {
-            text-align: center; /* Center the text */
+            text-align: center;
         }
         .invoice-header h1 {
             font-size: 8px;
@@ -146,7 +146,7 @@ $remainingBalance = $totalFees - $totalPayments;
             font-size: 7px;
         }
         .footer-text {
-            font-size: 3px; /* Adjusted size for footer text */
+            font-size: 3px;
         }
     </style>
 </head>
@@ -260,18 +260,6 @@ $remainingBalance = $totalFees - $totalPayments;
         </footer>
     </div>
 </div>
-
-<!-- Form for submitting tuition payment -->
-<div class="container mt-3">
-    <form method="POST" action="">
-        <div class="form-group">
-            <label for="tuition">Enter Tuition Amount:</label>
-            <input type="number" id="tuition" name="tuition" placeholder="Enter tuition amount" min="0" step="0.01" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit Payment</button>
-    </form>
-</div>
-
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
