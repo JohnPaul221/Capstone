@@ -8,8 +8,15 @@ if (isset($_GET['course_id'])) {
     $course_id = $_GET['course_id'];
 }
 
-$stmt = $conn->prepare("SELECT * FROM students WHERE course_id = ?");
-$stmt->bind_param("s", $course_id);
+$usn = '';
+if (isset($_GET['usn'])) {
+    $usn = $_GET['usn'];
+}
+
+// Prepare the SQL statement to search for students by course_id and USN
+$stmt = $conn->prepare("SELECT id, usn, first_name, middle_name, last_name, email, contact, year_level FROM students WHERE course_id = ? AND (usn LIKE ? OR usn IS NULL)");
+$searchTerm = '%' . $usn . '%';
+$stmt->bind_param("ss", $course_id, $searchTerm);
 $stmt->execute();
 $result = $stmt->get_result();
 $students = $result->fetch_all(MYSQLI_ASSOC);
@@ -109,7 +116,7 @@ foreach ($year_order as $year) {
             font-size: 24px;
         }
         table {
-            width: 100%;
+            width:  100%;
             border-collapse: collapse;
             margin: 20px 0;
             border-radius: 8px;
@@ -156,31 +163,42 @@ foreach ($year_order as $year) {
 </div>
 <div id="main">
     <button id="openBtn"><i class="fa-solid fa-bars"></i></button>
-    <h2>Students Enrolled in <?= htmlspecialchars($course_id) ?></h2>
+    <h1>Students in <?= htmlspecialchars($course_id) ?></h1>
+
+    <form method="GET" action="">
+        <input type="hidden" name="course_id" value="<?= htmlspecialchars($course_id) ?>">
+        <input type="text" name="usn" placeholder="Search by USN" class="form-control" style="width: 300px; display: inline-block;">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
     <?php if (!empty($sorted_students_by_year)): ?>
         <?php foreach ($sorted_students_by_year as $year_level => $students): ?>
             <h3><?= htmlspecialchars($year_level) ?> Students</h3>
             <table>
                 <tr>
-                    <th>Name</th>
+                    <th>USN</th>
+                    <th>First Name</th>
+                    <th>Middle Name</th>
+                    <th>Last Name</th>
                     <th>Email</th>
                     <th>Contact</th>
+                    <th>Action</th>
                 </tr>
                 <?php foreach ($students as $student): ?>
                     <tr>
-                        <td>
-                            <a href="student_details.php?id=<?= $student['id'] ?>">
-                                <?= htmlspecialchars($student['last_name']) ?>, <?= htmlspecialchars($student['first_name']) ?> <?= htmlspecialchars($student['middle_name']) ?>
-                            </a>
-                        </td>
+                        <td><?= htmlspecialchars($student['usn']) ?></td>
+                        <td><?= htmlspecialchars($student['first_name']) ?></td>
+                        <td><?= htmlspecialchars($student['middle_name']) ?></td>
+                        <td><?= htmlspecialchars($student['last_name']) ?></td>
                         <td><?= htmlspecialchars($student['email']) ?></td>
                         <td><?= htmlspecialchars($student['contact']) ?></td>
+                        <td><a href="student_details.php?id=<?= htmlspecialchars($student['id']) ?>" class="btn btn-primary">View</a></td>
                     </tr>
                 <?php endforeach; ?>
             </table>
         <?php endforeach; ?>
     <?php else: ?>
-        <p class="no-students">No students enrolled in this course yet.</p>
+        <p class="no-students">No students found matching your search.</p>
     <?php endif; ?>
 </div>
 <script>
