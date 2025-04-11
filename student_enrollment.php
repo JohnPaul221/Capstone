@@ -108,15 +108,14 @@ $conn->close();
             background-color: #f4f4f4;
         }
 
-        h1, h2 {
+        h1 {
             text-align: center;
+            color: black; /* Set the color of h1 to black */
         }
 
-        fieldset {
-            border: 1px solid #cccccc;
-            border-radius: 5px;
-            margin: 15px 0;
-            padding: 10px;
+        h2 {
+            text-align: center;
+            color: blue; /* Set the color of h2 to blue */
         }
 
         legend {
@@ -228,264 +227,269 @@ $conn->close();
     </style>
 </head>
 <body>
-<h1>ACLC COLLEGE</h1>
-<h2>SENIOR HIGH SCHOOL APPLICATION FORM</h2>
-    <p>Fill out completely</p>
+<div style="text-align: center;">
+    <img src="upload/aclc_logo.png" alt="ACLC Logo" style="height: 3em; vertical-align: middle;">
+    <h1 style="display: inline; margin-left: 10px; font-size: 2em;">ACLC COLLEGE</h1>
+</div>
+<h2>COLLEGE APPLICATION FORM</h2>
+<p>Fill out completely</p>
 
-    <form action="" method="POST">
-        <?php if (!empty($success_message)): ?>
-            <div class="success-message">
-                <?php echo $success_message; ?>
+<form action="" method="POST">
+    <?php if (!empty($success_message)): ?>
+        <div class="success-message">
+            <?php echo $success_message; ?>
+        </div>
+    <?php endif; ?>
+    <?php if (!empty($error_message)): ?>
+        <div class="error-message">
+            <?php echo $error_message; ?>
+        </div>
+    <?php endif; ?>
+
+    <fieldset>
+        <legend>PERSONAL INFORMATION:</legend>
+        <label for="usn">USN No:</label>
+        <input type="text" id="usn" name="usn" required>
+
+        <label for="name">NAME:</label>
+        <div class="name-container">
+            <input type="text" id="last-name" name="last_name" placeholder="Last" required>
+            <input type ="text" id="first-name" name="first_name" placeholder="First" required>
+            <input type="text" id="middle-name" name="middle_name" placeholder="Middle" required>
+        </div>
+
+        <label for="address">ADDRESS:</label>
+        <input type="text" id="address" name="address" required>
+
+        <div class="contact-container">
+            <div>
+                <label for="email">E-Mail Address:</label>
+                <input type="email" id="email" name="email" required>
             </div>
-        <?php endif; ?>
-        <?php if (!empty($error_message)): ?>
-            <div class="error-message">
-                <?php echo $error_message; ?>
+            <div>
+                <label for="contact">Contact No:</label>
+                <input type="text" id="contact" name="contact" required>
             </div>
-        <?php endif; ?>
-
-        <fieldset>
-            <legend>PERSONAL INFORMATION:</legend>
-            <label for="usn">USN No:</label>
-            <input type="text" id="usn" name="usn" required>
-
-            <label for="name">NAME:</label>
-            <div class="name-container">
-                <input type="text" id="last-name" name="last_name" placeholder="Last" required>
-                <input type="text" id="first-name" name="first_name" placeholder="First" required>
-                <input type="text" id="middle-name" name="middle_name" placeholder="Middle" required>
+            <div>
+                <label for="lrn">LRN:</label>
+                <input type="text" id="lrn" name="lrn" required>
             </div>
+        </div>
 
-            <label for="address">ADDRESS:</label>
-            <input type="text" id="address" name="address" required>
-
-            <div class="contact-container">
-                <div>
-                    <label for="email">E-Mail Address:</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div>
-                    <label for="contact">Contact No:</label>
-                    <input type="text" id="contact" name="contact" required>
-                </div>
-                <div>
-                    <label for="lrn">LRN:</label>
-                    <input type="text" id="lrn" name="lrn" required>
-                </div>
+        <div class="dob-pob-container">
+            <div>
+                <label for="dob">Date of Birth :</label>
+                <input type="date" id="dob" name="dob" required>
             </div>
-
-            <div class="dob-pob-container">
-                <div>
-                    <label for="dob">Date of Birth :</label>
-                    <input type="date" id="dob" name="dob" required>
-                </div>
-                <div>
-                    <label for="pob">Place of Birth:</label>
-                    <input type="text" id="pob" name="pob" required>
-                </div>
+            <div>
+                <label for="pob">Place of Birth:</label>
+                <input type="text" id="pob" name="pob" required>
             </div>
+        </div>
 
-            <div class="age-sex-civil-container">
-                <div>
-                    <label for="age">Age:</label>
-                    <input type="number" id="age" name="age" required>
-                </div>
-                <div>
-                    <label for="sex">Sex:</label>
-                    <select id="sex" name="sex" required>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="civil-status">Civil Status:</label>
-                    <select id="civil-status" name="civil_status" required>
-                        <option value="single">Single</option>
-                        <option value="married">Married</option>
-                        <option value="widowed">Widowed</option>
-                    </select>
-                </div>
+        <div class="age-sex-civil-container">
+            <div>
+                <label for="age">Age:</label>
+                <input type="number" id="age" name="age" required>
             </div>
+            <div>
+                <label for="sex">Sex:</label>
+                <select id="sex" name="sex" required>
+                    <option value="" disabled selected>Sex:</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+            <div>
+                <label for="civil-status">Civil Status:</label>
+                <select id="civil-status" name="civil_status" required>
+                    <option value="" disabled selected>Civil Status:</option>
+                    <option value="single">Single</option>
+                    <option value="married">Married</option>
+                    <option value="widowed">Widowed</option>
+                </select>
+            </div>
+        </div>
 
-            <div class="parent-guardian-container">
-                <div>
-                    <label for="guardian-name">Guardian's Name:</label>
-                    <input type="text" id="guardian-name" name="guardian_name" required>
-                </div>
-                <div>
-                    <label for="guardian-contact">Guardian's Contact No:</label>
-                    <input type="text" id="guardian-contact" name="guardian_contact" required>
-                </div>
+        <div class="parent-guardian-container">
+            <div>
+                <label for="guardian-name">Guardian's Name:</label>
+                <input type="text" id="guardian-name" name="guardian_name" >
             </div>
-        </fieldset>
+            <div>
+                <label for="guardian-contact">Guardian's Contact No:</label>
+                <input type="text" id="guardian-contact" name="guardian_contact" >
+            </div>
+        </div>
 
         <div class="education-container">
-            <fieldset>
-                <legend>EDUCATIONAL BACKGROUND:</legend>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>School Name</th>
-                        <th>Year Graduated</th>
-                        <th>Address</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td><input type="text" name="school_name_1" required></td>
-                        <td><input type="text" name="year_graduated_1" required></td>
-                        <td><input type="text" name="address_1" required></td>
-                    </tr>
-                    <tr>
-                        <td><input type="text" name="school_name_2"></td>
-                        <td><input type="text" name="year_graduated_2"></td>
-                        <td><input type="text" name="address_2"></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </fieldset>
-
-            <fieldset>
-                <legend>How did you happen to know about ACLC College of Iriga?</legend>
-                <div style="display: flex; justify-content: space-between ;">
-                    <div>
-                        <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-1')"> Newspaper Ads</label><br>
-                        <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-2')"> Friends/Relatives</label>
-                    </div>
-                    <div>
-                        <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-3')"> Radio Ads</label><br>
-                        <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-4')"> TV Ads</label>
-                    </div>
-                    <div>
-                        <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-5')"> ACLC Students/Graduates</label><br>
-                        <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-6')"> Others (please specify):</label>
-                        <input type="text" id="other-input-6" class="other-input" placeholder="Specify...">
-                    </div>
+            <legend>EDUCATIONAL BACKGROUND:</legend>
+            <table>
+                <thead>
+                <tr>
+                    <th>School Name</th>
+                    <th>Year Graduated</th>
+                    <th>Address</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><input type="text" name="school_name_1" required></td>
+                    <td><input type="text" name="year_graduated_1" required></td>
+                    <td><input type="text" name="address_1" required></td>
+                </tr>
+                <tr>
+                    <td><input type="text" name="school_name_2"></td>
+                    <td><input type="text" name="year_graduated_2"></td>
+                    <td><input type="text" name="address_2"></td>
+                </tr>
+                </tbody>
+            </table>
+            <br>
+            <legend>How did you happen to know about ACLC College of Iriga?</legend>
+            <div style="display: flex; justify-content: space-between;">
+                <div>
+                    <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-1')"> Newspaper Ads</label><br>
+                    <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-2')"> Friends/Relatives</label>
                 </div>
-            </fieldset>
-
-            <fieldset>
-                <legend>What made you decide to enroll ACLC College of Iriga, Inc.?</legend>
-                <div style="display: flex; justify-content: space-between;">
-                    <div>
-                        <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-7')">Parents</label><br>
-                        <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-8')"> Other Relatives</label>
-                    </div>
-                    <div>
-                        <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-9')"> Friends</label><br>
-                        <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-10')"> School Images</label>
-                    </div>
-                    <div>
-                        <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-11')"> Advertisements</label><br>
-                        <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-12')"> Proximity of Place</label>
-                    </div>
-                    <div>
-                        <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-13')"> Others (please specify):</label>
-                        <input type="text" id="other-input-13" class="other-input" placeholder="Specify...">
-                    </div>
+                <div>
+                    <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-3')"> Radio Ads</label><br>
+                    <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-4')"> TV Ads</label>
                 </div>
-            </fieldset>
-
-            <fieldset>
-                <legend>What Course do you intend to enroll?</legend>
-                <div class="course-year-container">
-                    <select name="course_id" required>
-                        <option value="" disabled selected>Select Course:</option>
-                        <option value="BSCS">BS Computer Science (BSCS)</option>
-                        <option value="BSENTREP">Bachelor of Science in Entrepreneurship (BSENTREP)</option>
-                        <option value="BSAIS">Bachelor of Science in Accounting Information System (BSAIS)</option>
-                        <option value="ACT">Associate in Computer Technology (ACT)</option>
-                    </select>
-                    <select name="year_level" required>
-                        <option value="" disabled selected>Select Year Level:</option>
-                        <option value="First Year">First Year</option>
-                        <option value="Second Year">Second Year</option>
-                        <option value="Third Year">Third Year</option>
-                        <option value="Fourth Year">Fourth Year</option>
-                    </select>
+                <div>
+                    <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-5')"> ACLC Students/Graduates</label><br>
+                    <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-6')"> Others ( please specify):</label>
+                    <input type="text" id="other-input-6" class="other-input" placeholder="Specify..." style="display: none;">
                 </div>
-                <input type="number" name="payment_upon_enrollment" placeholder="Upon Enrollment (₱):" required min="0" step="0.01">
-
-                <div id="subjects-display" style="display: none;">
-                    <h4>
-                        Subjects for <span id="course-year-title"></span>
-                        <span class="close-icon" onclick="closeSubjects()">&times;</span>
-                    </h4>
-                    <div id="subject-list-content"></div>
+            </div>
+            <br>
+            <legend>What made you decide to enroll ACLC College of Iriga, Inc.?</legend>
+            <div style="display: flex; justify-content: space-between;">
+                <div>
+                    <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-7')"> Parents</label><br>
+                    <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-8')"> Other Relatives</label>
                 </div>
-                <input type="hidden" name="subjects[]" id="selected-subjects" value="">
-                <button type="submit">Enroll</button>
-            </fieldset>
-        </div>
-    </form>
-    </div>
-    <script>
-        const subjectsByCourse = {
-            'BSCS': {
-                'First Year': [
-                    { name: 'Euthenics 2' },
-                    { name: 'Computer Programming 2 (Lab)' },
-                    { name: 'Computer Programming 2 (Lec)' },
-                    { name: 'Math in the Modern World' },
-                    { name: 'National Service Training Program 2' },
-                    { name: 'PATHFIT 2' },
-                    { name: 'Ethics' },
-                    { name: 'Discrete Structure 1' },
-                ],
-                'Second Year': [
-                    { name: 'Data Communication and Networking 2' }
-                ]
-            },
-            'BSENTREP': {
-                'First Year': [
-                    { name: 'Introduction to Entrepreneurship' },
-                    { name: 'Business Mathematics' },
-                    { name: 'Fundamentals of Marketing' },
-                    { name: 'Business Communication' },
-                ],
-                'Second Year': [
-                    { name: 'Entrepreneurial Finance' },
-                    { name: 'Operations Management' }
-                ]
-            },
-            'BSAIS': {
-                'First Year': [
-                    { name: 'Introduction to Accounting' },
-                    { name: 'Business Law' },
-                    { name: 'Financial Management' },
-                ],
-                'Second Year': [
-                    { name: 'Cost Accounting' },
-                    { name: 'Management Accounting' }
-                ]
-            },
-            'ACT': {
-                'First Year': [
-                    { name: 'Computer Fundamentals' },
-                    { name: 'Introduction to Programming' },
-                ],
-                'Second Year': [
-                    { name: 'Web Development' },
-                    { name: 'Database Management' }
-                ]
-            }
-        };
+                <div>
+                    <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-9')"> Friends</label><br>
+                    <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-10')"> School Images</label>
+                </div>
+                <div>
+                    <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-11')"> Advertisements</label><br>
+                    <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-12')"> Proximity of Place</label>
+                </div>
+                <div>
+                    <label><input type="checkbox" onclick="toggleOtherInput(this, 'other-input-13')"> Others (please specify):</label>
+                    <input type="text" id="other-input-13" class="other-input" placeholder="Specify..." style="display: none;">
+                </div>
+            </div>
+            <br>
+            <legend>What Course do you intend to enroll?</legend>
+            <div class="course-year-container">
+                <select name="course_id" required>
+                    <option value="" disabled selected>Select Course:</option>
+                    <option value="BSCS">BS Computer Science (BSCS)</option>
+                    <option value="BSENTREP">Bachelor of Science in Entrepreneurship (BSENTREP)</option>
+                    <option value="BSAIS">Bachelor of Science in Accounting Information System (BSAIS)</option>
+                    <option value="ACT">Associate in Computer Technology (ACT)</option>
+                </select>
+                <select name="year_level" required>
+                    <option value="" disabled selected>Select Year Level:</option>
+                    <option value="First Year">First Year</option>
+                    <option value="Second Year">Second Year</option>
+                    <option value="Third Year">Third Year</option>
+                    <option value="Fourth Year">Fourth Year</option>
+                </select>
+            </div>
+            <input type="number" name="payment_upon_enrollment" placeholder="Upon Enrollment (₱):" required min="0" step="0.01">
 
-        const yearSelect = document.querySelector('select[name="year_level"]');
-        const courseSelect = document.querySelector('select[name="course_id"]');
-        const subjectsDiv = document.getElementById('subjects-display');
-        const subjectListContent = document.getElementById('subject-list-content');
-        const selectedSubjectsInput = document.getElementById('selected-subjects');
-        const courseYearTitle = document.getElementById('course-year-title');
+            <div id="subjects-display" style="display: none;">
+                <h4>
+                    Subjects for <span id="course-year-title"></span>
+                    <span class="close-icon" onclick="closeSubjects()">&times;</span>
+                </h4>
+                <div id="subject-list-content"></div>
+            </div>
+            <input type="hidden" name="subjects[]" id="selected-subjects" value="">
+            <button type="submit">Enroll</button>
+    </fieldset>
+</form>
+<script>
+    function toggleOtherInput(checkbox, inputId) {
+        const inputField = document.getElementById(inputId);
+        if (checkbox.checked) {
+            inputField.style.display = 'block'; // Show the input field
+        } else {
+            inputField.style.display = 'none'; // Hide the input field
+            inputField.value = ''; // Clear the input field when hidden
+        }
+    }
 
-        function updateSubjectsDisplay() {
-            const selectedCourse = courseSelect.value;
-            const selectedYear = yearSelect.value;
+    const subjectsByCourse = {
+        'BSCS': {
+            'First Year': [
+                { name: 'Euthenics 2' },
+                { name: 'Computer Programming 2 (Lab)' },
+                { name: 'Computer Programming 2 (Lec)' },
+                { name: 'Math in the Modern World' },
+                { name: 'National Service Training Program 2' },
+                { name: 'PATHFIT 2' },
+                { name: 'Ethics' },
+                { name: 'Discrete Structure 1' },
+            ],
+            'Second Year': [
+                { name: 'Data Communication and Networking 2' }
+            ]
+        },
+        'BSENTREP': {
+            'First Year': [
+                { name: 'Introduction to Entrepreneurship' },
+                { name: 'Business Mathematics' },
+                { name: 'Fundamentals of Marketing' },
+                { name: 'Business Communication' },
+            ],
+            'Second Year': [
+                { name: 'Entrepreneurial Finance' },
+                { name: 'Operations Management' }
+            ]
+        },
+        'BSAIS': {
+            'First Year': [
+                { name: 'Introduction to Accounting' },
+                { name: 'Business Law' },
+                { name: 'Financial Management' },
+            ],
+            'Second Year': [
+                { name: 'Cost Accounting' },
+                { name: 'Management Accounting' }
+            ]
+        },
+        'ACT': {
+            'First Year': [
+                { name: 'Computer Fundamentals' },
+                { name: 'Introduction to Programming' },
+            ],
+            'Second Year': [
+                { name: 'Web Development' },
+                { name: 'Database Management' }
+            ]
+        }
+    };
 
-            if (selectedCourse && selectedYear) {
-                const subjects = subjectsByCourse[selectedCourse]?.[selectedYear] || [];
-                courseYearTitle.textContent = `${selectedYear} (${selectedCourse})`;
-                subjectListContent.innerHTML = `
+    const yearSelect = document.querySelector('select[name="year_level"]');
+    const courseSelect = document.querySelector('select[name="course_id"]');
+    const subjectsDiv = document.getElementById('subjects-display');
+    const subjectListContent = document.getElementById('subject-list-content');
+    const selectedSubjectsInput = document.getElementById('selected-subjects');
+    const courseYearTitle = document.getElementById('course-year-title');
+
+    function updateSubjectsDisplay() {
+        const selectedCourse = courseSelect.value;
+        const selectedYear = yearSelect.value;
+
+        if (selectedCourse && selectedYear) {
+            const subjects = subjectsByCourse[selectedCourse]?.[selectedYear] || [];
+            courseYearTitle.textContent = `${selectedYear} (${selectedCourse})`;
+            subjectListContent.innerHTML = `
             <ul class="subject-list">
                 ${subjects.map((subject, index) => `
                     <li>
@@ -495,31 +499,31 @@ $conn->close();
                 `).join('')}
             </ul>
         `;
-                subjectsDiv.style.display = 'block';
-            } else {
-                subjectListContent.innerHTML = '';
-                subjectsDiv.style.display = 'none';
-            }
-        }
-
-        function updateSelectedSubjects() {
-            const checkboxes = subjectListContent.querySelectorAll('input[type="checkbox"]');
-            const selectedSubjects = [];
-
-            checkboxes.forEach(checkbox => {
-                if (checkbox.checked) {
-                    selectedSubjects.push(checkbox.value);
-                }
-            });
-            selectedSubjectsInput.value = selectedSubjects.join(',');
-        }
-
-        function closeSubjects() {
+            subjectsDiv.style.display = 'block';
+        } else {
+            subjectListContent.innerHTML = '';
             subjectsDiv.style.display = 'none';
         }
+    }
 
-        yearSelect.addEventListener('change', updateSubjectsDisplay);
-        courseSelect.addEventListener('change', updateSubjectsDisplay);
-    </script>
+    function updateSelectedSubjects() {
+        const checkboxes = subjectListContent.querySelectorAll('input[type="checkbox"]');
+        const selectedSubjects = [];
+
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                selectedSubjects.push(checkbox.value);
+            }
+        });
+        selectedSubjectsInput.value = selectedSubjects.join(',');
+    }
+
+    function closeSubjects() {
+        subjectsDiv.style.display = 'none';
+    }
+
+    yearSelect.addEventListener('change', updateSubjectsDisplay);
+    courseSelect.addEventListener('change', updateSubjectsDisplay);
+</script>
 </body>
 </html>

@@ -90,6 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tuition'])) {
         exit();
     }
 }
+
 $stmt_payments = $conn->prepare("SELECT amount, payment_date FROM tuition_payment WHERE student_id = ?");
 $stmt_payments->bind_param("i", $student_id);
 $stmt_payments->execute();
@@ -111,156 +112,173 @@ $remainingBalance = $totalFees - $totalPayments;
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Details</title>
     <style>
+        /* General Styles */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #e9ecef;
             margin: 0;
             padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
-        .page {
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 800px;
-            margin: 20px 0;
+
+        /* Container Styles */
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+            max-width: 800px; /* Limit the maximum width */
+            margin-left: auto; /* Center the container */
+            margin-right: auto; /* Center the container */
         }
+
+        /* Heading Styles */
         h2 {
-            text-align: center;
-            color: #343a40;
+            color: #007BFF;
+            border-bottom: 2px solid #007BFF;
+            padding-bottom: 10px;
+            font-size: 24px;
         }
+
+        /* Detail Styles */
         .detail {
-            margin: 10px 0;
-            padding: 10px;
-            border-bottom: 1px solid #ced4da;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
         }
-        label {
+
+        /* Label Styles */
+        .detail label {
             font-weight: bold;
             color: #495057;
         }
+
+        /* List Styles */
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        /* Table Styles */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
+            margin-top: 15px;
         }
+
+        /* Table Cell Styles */
         th, td {
-            padding: 10px;
+            border: 1px solid #dee2e6;
+            padding: 12px;
             text-align: left;
-            border-bottom: 1px solid #ced4da;
         }
+
+        /* Table Header Styles */
         th {
-            background-color: #007bff;
+            background-color: #007BFF;
             color: white;
         }
+
+        /* Button Container Styles */
+        .button-container {
+            margin-top: 25px;
+        }
+
+        /* Button Styles */
         .button {
-            background-color: #007bff;
+            background-color: #007BFF;
             color: white;
+            padding: 12px 20px;
             border: none;
             border-radius: 5px;
-            padding: 10px;
             cursor: pointer;
-            text-align: center;
             text-decoration: none;
-            display: inline-block;
-            margin-top: 10px;
+            transition: background-color 0.3s;
+            font-size: 16px;
         }
+
+        /* Button Hover Styles */
         .button:hover {
             background-color: #0056b3;
         }
+
+        /* Print Button Styles */
+        .print-button {
+            margin-left: 10px;
+        }
+
+        /* Right Align Styles */
         .right-align {
             text-align: right;
         }
-        .button-container {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
+
+        /* Responsive Styles */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px; /* Reduce padding on smaller screens */
+            }
+            h2 {
+                font-size: 20px; /* Smaller heading on mobile */
+            }
+            .button {
+                width: 100%; /* Full width buttons on mobile */
+                margin-bottom: 10px; /* /* Space between buttons */
+            }
+            th, td {
+                padding: 8px; /* Smaller padding in tables */
+            }
         }
     </style>
-    <script>
-        function printPage() {
-            window.print();
-        }
-        function printReceipt() {
-            var receiptContent = document.getElementById('receipt-section').innerHTML;
-            var originalContent = document.body.innerHTML;
-
-            document.body.innerHTML = receiptContent;
-            window.print();
-            document.body.innerHTML = originalContent;
-        }
-    </script>
 </head>
 <body>
-<div class="page">
+<div class="container" id="student-details">
     <h2>Student Details</h2>
     <div class="detail">
-        <label>USN:</label> <?= htmlspecialchars($student['usn']) ?>
+        <label>USN:</label> <?= htmlspecialchars($student['usn']) ?> &nbsp; &nbsp; <label>Date:</label> <?= htmlspecialchars($created_at) ?>
     </div>
     <div class="detail">
-        <label>Last Name:</label> <?= htmlspecialchars($student['last_name']) ?>
-    </div>
-    <div class="detail">
-        <label>First Name:</label> <?= htmlspecialchars($student['first_name']) ?>
-    </div>
-    <div class="detail">
-        <label>Middle Name:</label> <?= htmlspecialchars($student['middle_name']) ?>
-    </div>
-    <div class="detail">
-        <label>Email:</label> <?= htmlspecialchars($student['email']) ?>
-    </div>
-    <div class="detail">
-        <label>Contact:</label> <?= htmlspecialchars($student['contact']) ?>
-    </div>
-    <div class="detail">
-        <label>LRN:</label> <?= htmlspecialchars($student['lrn']) ?>
-    </div>
-    <div class="detail">
-        <label>Date of Birth:</label> <?= htmlspecialchars($student['dob']) ?>
-    </div>
-    <div class="detail">
-        <label>Place of Birth:</label> <?= htmlspecialchars($student['pob']) ?>
-    </div>
-    <div class="detail">
-        <label>Age:</label> <?= htmlspecialchars($student['age']) ?>
-    </div>
-    <div class="detail">
-        <label>Course ID:</label> <?= htmlspecialchars($student['course_id']) ?>
-    </div>
-    <div class="detail">
-        <label>Year Level:</label> <?= htmlspecialchars($student['year_level']) ?>
-    </div>
-    <div class="detail">
-        <label>Upon Enrollment:</label> <?= htmlspecialchars($student['upon_enrollment']) ?>
-    </div>
-    <div class="detail">
-        <label>Sex:</label> <?= htmlspecialchars($student['sex']) ?>
-    </div>
-    <div class="detail">
-        <label>Civil Status:</label> <?= htmlspecialchars($student['civil_status']) ?>
-    </div>
-    <div class="detail">
-        <label>Guardian Name:</label> <?= htmlspecialchars($student['guardian_name']) ?>
-    </div>
-    <div class="detail">
-        <label>Guardian Contact:</label> <?= htmlspecialchars($student['guardian_contact']) ?>
-    </div>
-    <div class="detail">
-        <label>Created At:</label> <?= htmlspecialchars($created_at) ?>
+        <label>Last Name:</label> <?= htmlspecialchars($student['last_name']) ?> &nbsp; &nbsp; <label>First Name:</label> <?= htmlspecialchars($student['first_name']) ?> &nbsp; &nbsp; <label>Middle Name:</label> <?= htmlspecialchars($student['middle_name']) ?>
     </div>
     <div class="detail">
         <label>Address:</label> <?= htmlspecialchars($student['address']) ?>
     </div>
+    <div class="detail">
+        <label>Email:</label> <?= htmlspecialchars($student['email']) ?> &nbsp; &nbsp; <label>Contact:</label> <?= htmlspecialchars($student['contact']) ?> &nbsp; &nbsp; <label>LRN:</label> <?= htmlspecialchars($student['lrn']) ?>
+    </div>
+    <div class="detail">
+        <label>Date of Birth:</label> <?= htmlspecialchars($student['dob']) ?> &nbsp; &nbsp; <label>Place of Birth:</label> <?= htmlspecialchars($student['pob']) ?>
+    </div>
+    <div class="detail">
+        <label>Age:</label> <?= htmlspecialchars($student['age']) ?> &nbsp; &nbsp; <label>Sex:</label> <?= htmlspecialchars($student['sex']) ?> &nbsp; &nbsp; <label>Civil Status:</label> <?= htmlspecialchars($student['civil_status']) ?>
+    </div>
+    <div class="detail">
+        <label>Guardian Name:</label> <?= htmlspecialchars($student['guardian_name']) ?> &nbsp; &nbsp; <label>Guardian Contact:</label> <?= htmlspecialchars($student['guardian_contact']) ?>
+    </div>
+    <div class="detail">
+        <label>Course ID:</label> <?= htmlspecialchars($student['course_id']) ?> &nbsp; &nbsp; <label>Year Level:</label> <?= htmlspecialchars($student['year_level']) ?>
+        <label>Selected Subjects:</label>
+        <ul>
+            <?php
+            if (!empty($selected_subjects)) {
+                $subjects = explode(',', $selected_subjects);
+                foreach ($subjects as $subject) {
+                    echo '<li>' . htmlspecialchars(trim($subject)) . '</li>';
+                }
+            } else {
+                echo '<li>No subjects found.</li>';
+            }
+            ?>
+        </ul>
+    </div>
 </div>
-<div class ="page">
+
+<div class="container" id="subject-details">
     <h2>Subject Details</h2>
     <div class="detail">
-        <label>Selected Subjects:</label>
+        <label>Subjects details :</label>
         <table>
             <thead>
             <tr>
@@ -280,7 +298,6 @@ $remainingBalance = $totalFees - $totalPayments;
                     }
                 }
                 echo '<tr><td>Total Fees:</td><td>₱' . number_format($totalFees, 2) . '</td></tr>';
-                echo '<tr><td>Remaining Balance:</td><td>₱' . number_format($remainingBalance, 2) . '</td></tr>';
                 echo '<tr><td colspan="2">
                         <form method="POST" action="">
                             <label for="tuition">Enter Tuition Amount:</label>
@@ -288,23 +305,6 @@ $remainingBalance = $totalFees - $totalPayments;
                             <button type="submit" class="button">Submit Payment</button>
                         </form>
                     </td></tr>';
-                echo '<tr><td colspan="2" style="text-align: left;"><strong>Tuition Payment History:</strong></td></tr>';
-                echo '<tr><td colspan="2">';
-                echo '<table style="width: 100%;">';
-                echo '<thead><tr><th style="text-align: left;">Payment Amount</th><th class="right-align">Payment Date</th></tr></thead>';
-                echo '<tbody>';
-                if ($student['upon_enrollment'] > 0) {
-                    echo '<tr><td>₱' . number_format($student['upon_enrollment'], 2) . '</td><td class="right-align">' . date('F j, Y', strtotime($created_at)) . '</td></tr>';
-                }
-                if (!empty($tuition_payments)) {
-                    foreach ($tuition_payments as $payment) {
-                        echo '<tr><td>₱' . number_format($payment['amount'], 2) . '</td><td class="right-align">' . date('F j, Y', strtotime($payment['payment_date'])) . '</td></tr>';
-                    }
-                } else {
-                    echo '<tr><td colspan="2">No tuition payments recorded.</td></tr>';
-                }
-                echo '</tbody></table>';
-                echo '</td></tr>';
             } else {
                 echo '<tr><td colspan="2">No subjects found.</td></tr>';
             }
@@ -312,11 +312,53 @@ $remainingBalance = $totalFees - $totalPayments;
             </tbody>
         </table>
     </div>
-    <div class="detail button-container">
+</div>
+
+<div class="container" id="tuition-payment-history">
+    <h2>Tuition Payment History</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Payment Date</th>
+            <th>Amount</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php
+        if (!empty($tuition_payments)) {
+            foreach ($tuition_payments as $payment) {
+                echo '<tr><td>' . htmlspecialchars($payment['payment_date']) . '</td><td>₱' . number_format($payment['amount'], 2) . '</td></tr>';
+            }
+        } else {
+            echo '<tr><td colspan="2">No payment history found.</td></tr>';
+        }
+        ?>
+        <tr>
+            <td><strong>Remaining Balance:</strong></td>
+            <td><strong>₱<?php echo number_format($remainingBalance, 2); ?></strong></td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="button-container">
         <a href="<?= htmlspecialchars(strtolower($course_id)) ?>.php?course_id=<?= htmlspecialchars($course_id) ?>" class="button">Back to <?= htmlspecialchars($course_id) ?> Students</a>
-        <button class="button print-button" onclick="printPage()">Print Details</button>
+        <button class="button print-button" onclick="printSection('student-details')">Print Student Details</button>
+        <button class="button print-button" onclick="printSection('subject-details')">Print Subject Details</button>
         <a href="reciept.php?id=<?= htmlspecialchars($student_id) ?>" class="button print-button">Print Receipt</a>
+        <br>
+        <br>
+        <button class="button print-button" onclick="printSection('tuition-payment-history')">Print tuition-payment-history</button>
     </div>
 </div>
+<script>
+    function printSection(sectionId) {
+        var printContents = document.getElementById(sectionId).innerHTML;
+        var originalContents = document.body.innerHTML;
+
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+        location.reload(); // Reload the page to restore the original content
+    }
+</script>
 </body>
 </html>

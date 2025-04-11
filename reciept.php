@@ -56,6 +56,8 @@ $totalFees = 0; // Calculate this based on selected subjects if needed
 $totalPayments = array_sum($tuition_payments) + $payment_upon_enrollment;
 $remainingBalance = $totalFees - $totalPayments;
 
+$currentDate = date("F j, Y"); // Get the current date
+
 ?>
 
 <!DOCTYPE html>
@@ -199,7 +201,7 @@ $remainingBalance = $totalFees - $totalPayments;
             </tr>
             <tr>
                 <td style="font-size: 7px;"></td>
-                <td style="font-size: 7px;"></td>
+                <td style="font-size: 7px;"><?= $currentDate ?></td>
             </tr>
             <tr>
                 <td style="font-size: 7px;"></td>
@@ -227,27 +229,32 @@ $remainingBalance = $totalFees - $totalPayments;
         <h2 style="font-size: 9px; text-align: left; font-weight: bold;">SERVICE INVOICE</h2>
 
         <div class="details">
+            <p style="text-align: right; margin-top: -5px;">Date: <?= $currentDate ?>
+                      <br>_____________________</p>
             <p>RECEIVED from: <?= getFullName($student) ?>
-            ____________________________________________</p>
+                ____________________________________________</p>
             <p>with TIN: ___________________________</p>
             <p>with address at: _____________________</p>
-            <p>the sum of pesos: ____________________</p <p>as partial/full payment of: ____________</p>
-            <p>Sr. Citizen TIN: _____________________</p>
+            <p>the sum of pesos: <?= number_format($payment_upon_enrollment, 2) ?>
+                <br>________________________________</p>
+            <p>as partial/full payment of: ____________</p>
         </div>
 
         <div class="signature">
-            <p>By: _____________________________</p>
-            <p>Cashier/Authorized Representative</p>
-            <p>No: 0096</p>
+            <p style="text-align: right; margin-bottom: -10px;">By: _____________________________</p>
+            <br>
+            <p style="text-align: right;">Cashier/Authorized Representative</p>
         </div>
+<br>
 
         <footer class="text-center mt-2">
             <p style="font-size: 7px;">Printer's Accreditation No: 064MP2024000000012</p>
-            <p style="font-size: 7px;">Date Issued: June 6, 2024 | Expiry Date: June 5, 2029</p>
+            <p style="font-size: 7px;">Date Issued: <?= $currentDate ?> | Expiry Date: June 5, 2029</p>
             <p style="font-size: 7px;">"THIS DOCUMENT IS NOT VALID FOR CLAIMING INPUT TAXES"</p>
         </footer>
     </div>
 </div>
+
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
