@@ -1,57 +1,46 @@
 <?php
 session_start();
-require_once 'Config/Database.php'; // Ensure this file connects to your database
+require_once 'Config/Database.php';
 global $conn;
 
-// Check if the student ID is provided in the URL
-if (!isset($_GET['id'])) {
-    die("Student ID not provided.");
+if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+    die("Invalid Student ID.");
 }
 
-// Get the student ID from the URL and sanitize it
 $student_id = intval($_GET['id']);
-
-// Prepare and execute the SQL statement to fetch student data
 $stmt = $conn->prepare("SELECT * FROM students WHERE id = ?");
 $stmt->bind_param("i", $student_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
-// Check if the student exists
 if ($result->num_rows === 0) {
     die("Student not found.");
 }
 
-// Fetch the student data
 $student = $result->fetch_assoc();
 $stmt->close();
 
-// Get the payment upon enrollment amount
-$payment_upon_enrollment = $student['upon_enrollment']; // Ensure this field exists in your database
-
-// Initialize the variable for the last submitted tuition amount
+$payment_upon_enrollment = $student['upon_enrollment'];
 $last_tuition_amount = 0;
 
-// Handle tuition payment submission
+// Function to get full name
+function getFullName($student) {
+    return trim($student['first_name'] . ' ' . $student['middle_name'] . ' ' . $student['last_name']);
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tuition'])) {
     $tuition_amount = floatval($_POST['tuition']);
     if ($tuition_amount > 0) {
-        // Insert the payment into the tuition_payment table
         $stmt_payment = $conn->prepare("INSERT INTO tuition_payment (student_id, amount) VALUES (?, ?)");
         $stmt_payment->bind_param("id", $student_id, $tuition_amount);
         $stmt_payment->execute();
         $stmt_payment->close();
-
-        // Set the last tuition amount to the submitted amount
         $last_tuition_amount = $tuition_amount;
-
-        // Redirect to the same page to avoid form resubmission
         header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . $student_id);
         exit();
     }
 }
 
-// Fetch all previous payments made by the student
 $stmt_payments = $conn->prepare("SELECT amount FROM tuition_payment WHERE student_id = ?");
 $stmt_payments->bind_param("i", $student_id);
 $stmt_payments->execute();
@@ -63,8 +52,7 @@ while ($row = $result_payments->fetch_assoc()) {
 $stmt_payments->close();
 $conn->close();
 
-// Calculate total fees and remaining balance
-$totalFees = 0; // You can calculate this based on selected subjects if needed
+$totalFees = 0; // Calculate this based on selected subjects if needed
 $totalPayments = array_sum($tuition_payments) + $payment_upon_enrollment;
 $remainingBalance = $totalFees - $totalPayments;
 
@@ -122,7 +110,7 @@ $remainingBalance = $totalFees - $totalPayments;
         th, td {
             border: 1px solid #ddd;
             padding: 5px;
-            text -align: left;
+            text-align: left;
         }
         th {
             background-color: #f2f2f2;
@@ -167,7 +155,7 @@ $remainingBalance = $totalFees - $totalPayments;
             <tbody>
             <tr>
                 <td style="font-size: 7px;">Tuition Fee</td>
-                <td style="font-size: 7px;">₱<?= number_format($last_tuition_amount, 2) ?></td> <!-- Display the last submitted tuition amount -->
+                <td style="font-size: 7px;"></td>
             </tr>
             <tr>
                 <td style="font-size: 7px;">Laboratory Fee</td>
@@ -183,7 +171,7 @@ $remainingBalance = $totalFees - $totalPayments;
             </tr>
             <tr>
                 <td style="font-size: 7px;">Upon Enrollment</td>
-                <td style="font-size: 7px;">₱<?= number_format($payment_upon_enrollment, 2) ?></td> <!-- Display the amount here -->
+                <td style="font-size: 7px;">₱<?= number_format($payment_upon_enrollment, 2) ?></td>
             </tr>
             <tr>
                 <td style="font-size: 7px;">Total Sales</td>
@@ -195,15 +183,15 @@ $remainingBalance = $totalFees - $totalPayments;
             </tr>
             <tr class="total-row">
                 <td style="font-size: 7px;">Total Due</td>
-                <td style="font-size: 7px;">₱<?= number_format($totalFees, 2) ?></td>
+                <td style="font-size: 7px;"></td>
             </tr>
             <tr class="total-row">
                 <td style="font-size: 7px;">Total Payment</td>
-                <td style="font-size: 7px;">₱<?= number_format($totalPayments, 2) ?></td>
+                <td style="font-size: 7px;"></td>
             </tr>
             <tr class="total-row">
                 <td style="font-size: 7px;">Change</td>
-                <td style="font-size: 7px;">₱<?= number_format($remainingBalance, 2) ?></td>
+                <td style="font-size: 7px;"></td>
             </tr>
             <tr>
                 <th style="font-size: 7px;">Name of Bank Check/Warrant No.</th>
@@ -239,11 +227,11 @@ $remainingBalance = $totalFees - $totalPayments;
         <h2 style="font-size: 9px; text-align: left; font-weight: bold;">SERVICE INVOICE</h2>
 
         <div class="details">
-            <p>RECEIVED from: ______________________</p>
+            <p>RECEIVED from: <?= getFullName($student) ?>
+            ____________________________________________</p>
             <p>with TIN: ___________________________</p>
             <p>with address at: _____________________</p>
-            <p>the sum of pesos: ____________________</p>
-            <p>as partial/full payment of: ____________</p>
+            <p>the sum of pesos: ____________________</p <p>as partial/full payment of: ____________</p>
             <p>Sr. Citizen TIN: _____________________</p>
         </div>
 

@@ -12,8 +12,6 @@ $usn = '';
 if (isset($_GET['usn'])) {
     $usn = $_GET['usn'];
 }
-
-// Prepare the SQL statement to search for students by course_id and USN
 $stmt = $conn->prepare("SELECT id, usn, first_name, middle_name, last_name, email, contact, year_level FROM students WHERE course_id = ? AND (usn LIKE ? OR usn IS NULL)");
 $searchTerm = '%' . $usn . '%';
 $stmt->bind_param("ss", $course_id, $searchTerm);
@@ -205,9 +203,9 @@ foreach ($year_order as $year) {
     function adjustMainContent(isOpen) {
         const mainContent = document.getElementById("main");
         if (isOpen) {
-            mainContent.style.marginLeft = "250px"; // Adjust margin when sidebar is open
+            mainContent.style.marginLeft = "250px";
         } else {
-            mainContent.style.marginLeft = "0"; // Reset margin when sidebar is closed
+            mainContent.style.marginLeft = "0";
         }
     }
 
@@ -215,14 +213,14 @@ foreach ($year_order as $year) {
         const sidebar = document.getElementById("sidebar");
         sidebar.classList.add("open");
         sidebar.style.display = "block";
-        adjustMainContent(true); // Call function to adjust main content
+        adjustMainContent(true);
     };
 
     document.getElementById("closeBtn").onclick = function() {
         const sidebar = document.getElementById("sidebar");
         sidebar.classList.remove("open");
         sidebar.style.display = "none";
-        adjustMainContent(false); // Call function to reset main content
+        adjustMainContent(false);
     };
 </script>
 </body>

@@ -12,8 +12,6 @@ $usn = '';
 if (isset($_GET['usn'])) {
     $usn = $_GET['usn'];
 }
-
-// Prepare the SQL statement to search for students by course_id and USN
 $stmt = $conn->prepare("SELECT id, usn, first_name, middle_name, last_name, email, contact, year_level FROM students WHERE course_id = ? AND (usn LIKE ? OR usn IS NULL)");
 $searchTerm = '%' . $usn . '%';
 $stmt->bind_param("ss", $course_id, $searchTerm);
@@ -54,7 +52,6 @@ foreach ($year_order as $year) {
         #main {
             padding: 30px;
             transition: margin-left 0.3s ease;
-            margin-left: 0; /* Default margin */
         }
         .sidebar {
             display: none;
@@ -62,7 +59,7 @@ foreach ($year_order as $year) {
             width: 250px;
             position: fixed;
             top: 0;
-            left: -250px; /* Start hidden */
+            left: -250px;
             background-color: #343a40;
             color: white;
             transition: left 0.3s ease;
@@ -71,7 +68,7 @@ foreach ($year_order as $year) {
         }
         .sidebar.open {
             display: block;
-            left: 0; /* Show sidebar */
+            left: 0;
         }
         .sidebar h2 {
             margin-top: 0;
@@ -122,7 +119,7 @@ foreach ($year_order as $year) {
             margin: 20px 0;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0,  0, 0.1);
         }
         th, td {
             border: 1px solid #ddd;
@@ -163,7 +160,7 @@ foreach ($year_order as $year) {
     </ul>
 </div>
 <div id="main">
-    <button id="openBtn"><i class="fas fa-bars"></i></button>
+    <button id="openBtn"><i class="fa-solid fa-bars"></i></button>
     <h1>Students in <?= htmlspecialchars($course_id) ?></h1>
 
     <form method="GET" action="">
@@ -172,49 +169,58 @@ foreach ($year_order as $year) {
         <button type="submit" class="btn btn-primary">Search</button>
     </form>
 
-    <table>
-        <thead>
-        <tr>
-            <th>USN</th>
-            <th>First Name</th>
-            <th>Middle Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-            <th>Contact</th>
-            <th>Action</th>
-        </tr>
-        </thead>
-        <tbody>
-        <?php foreach ($sorted_students_by_year as $year => $students): ?>
-            <tr>
-                <td colspan="7" style="background-color: #007bff; color: white; text-align: center;"><?= $year ?></td>
-            </tr>
-            <?php foreach ($students as $student): ?>
+    <?php if (!empty($sorted_students_by_year)): ?>
+        <?php foreach ($sorted_students_by_year as $year_level => $students): ?>
+            <h3><?= htmlspecialchars($year_level) ?> Students</h3>
+            <table>
                 <tr>
-                    <td><?= htmlspecialchars($student['usn']) ?></td>
-                    <td><?= htmlspecialchars($student['first_name']) ?></td>
-                    <td><?= htmlspecialchars($student['middle_name']) ?></td>
-                    <td><?= htmlspecialchars($student['last_name']) ?></td>
-                    <td><?= htmlspecialchars($student['email']) ?></td>
-                    <td><?= htmlspecialchars($student['contact']) ?></td>
-                    <td><a href="student_details.php?id=<?= htmlspecialchars($student['id']) ?>" class="btn btn-primary">View</a></td>
+                    <th>USN</th>
+                    <th>First Name</th>
+                    <th>Middle Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Contact</th>
+                    <th>Action</th>
                 </tr>
-            <?php endforeach; ?>
+                <?php foreach ($students as $student): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($student['usn']) ?></td>
+                        <td><?= htmlspecialchars($student['first_name']) ?></td>
+                        <td><?= htmlspecialchars($student['middle_name']) ?></td>
+                        <td><?= htmlspecialchars($student['last_name']) ?></td>
+                        <td><?= htmlspecialchars($student['email']) ?></td>
+                        <td><?= htmlspecialchars($student['contact']) ?></td>
+                        <td><a href="student_details.php?id=<?= htmlspecialchars($student['id']) ?>" class="btn btn-primary">View</a></td>
+                    </tr>
+                <?php endforeach; ?>
+            </table>
         <?php endforeach; ?>
-        </tbody>
-    </table>
-    <?php if (empty($students)): ?>
+    <?php else: ?>
         <p class="no-students">No students found matching your search.</p>
     <?php endif; ?>
 </div>
 <script>
-    document.getElementById('openBtn').onclick = function() {
-        document.getElementById('sidebar').classList.add('open');
-        document.getElementById('main').style.marginLeft = '250px'; // Adjust main content
+    function adjustMainContent(isOpen) {
+        const mainContent = document.getElementById("main");
+        if (isOpen) {
+            mainContent.style.marginLeft = "250px";
+        } else {
+            mainContent.style.marginLeft = "0";
+        }
+    }
+
+    document.getElementById("openBtn").onclick = function() {
+        const sidebar = document.getElementById("sidebar");
+        sidebar.classList.add("open");
+        sidebar.style.display = "block";
+        adjustMainContent(true);
     };
-    document.getElementById('closeBtn').onclick = function() {
-        document.getElementById('sidebar').classList.remove('open');
-        document.getElementById('main').style.marginLeft = '0'; // Reset main content
+
+    document.getElementById("closeBtn").onclick = function() {
+        const sidebar = document.getElementById("sidebar");
+        sidebar.classList.remove("open");
+        sidebar.style.display = "none";
+        adjustMainContent(false);
     };
 </script>
 </body>

@@ -1,24 +1,51 @@
 <?php
 session_start();
-require_once 'Config/Database.php'; // Ensure this file connects to your database
+require_once 'Config/Database.php';
 global $conn;
+
+function fetchStudentData($student_id) {
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT usn, last_name, first_name, middle_name, email, contact, lrn, dob, pob, age, course_id, year_level, upon_enrollment, sex, civil_status, guardian_name, guardian_contact, created_at, address, subjects FROM students WHERE id = ?");
+    $stmt->bind_param("i", $student_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows === 0) {
+        return null;
+    }
+
+    return $result->fetch_assoc();
+}
+
+function fetchAllStudentData($student_id) {
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM students WHERE id = ?");
+    $stmt->bind_param("i", $student_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows === 0) {
+        return null;
+    }
+
+    return $result->fetch_assoc();
+}
 
 if (!isset($_GET['id'])) {
     die("Student ID not provided.");
 }
 
 $student_id = intval($_GET['id']);
-$stmt = $conn->prepare("SELECT * FROM students WHERE id = ?");
-$stmt->bind_param("i", $student_id);
-$stmt->execute();
-$result = $stmt->get_result();
+$student = fetchStudentData($student_id);
 
-if ($result->num_rows === 0) {
+if ($student === null) {
     die("Student not found.");
 }
+$allStudentData = fetchAllStudentData($student_id);
 
-$student = $result->fetch_assoc();
-$created_at = $student['created_at']; // Fetch the created_at date
+$created_at = $student['created_at'];
 $course_id = $student['course_id'];
 $subjectFees = [
     'Euthenics 2' => 1500,
@@ -47,14 +74,12 @@ $submitted_tuition = 0;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tuition'])) {
     $tuition_amount = floatval($_POST['tuition']);
     if ($tuition_amount > 0) {
-        $current_date = date('Y-m-d H:i:s'); // Fetch the current date and time
+        $current_date = date('Y-m-d H:i:s');
         $stmt_payment = $conn->prepare("INSERT INTO tuition_payment (student_id, amount, payment_date) VALUES (?, ?, ?)");
-        $stmt_payment->bind_param("ids", $student_id, $tuition_amount, $current_date); // Bind the current date
+        $stmt_payment->bind_param("ids", $student_id, $tuition_amount, $current_date);
         $stmt_payment->execute();
         $stmt_payment->close();
-
-        // Update the payment upon enrollment if it hasn't been set yet
-        if (empty($student['enrollment_date'])) {
+        if (empty($student['created_at'])) {
             $stmt_update = $conn->prepare("UPDATE students SET upon_enrollment = ?, enrollment_date = ? WHERE id = ?");
             $stmt_update->bind_param("dsi", $tuition_amount, $current_date, $student_id);
             $stmt_update->execute();
@@ -65,23 +90,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tuition'])) {
         exit();
     }
 }
-
 $stmt_payments = $conn->prepare("SELECT amount, payment_date FROM tuition_payment WHERE student_id = ?");
 $stmt_payments->bind_param("i", $student_id);
 $stmt_payments->execute();
 $result_payments = $stmt_payments->get_result();
 $tuition_payments = [];
 while ($row = $result_payments->fetch_assoc()) {
-    $tuition_payments[] = $row; // Store both amount and date
+    $tuition_payments[] = $row;
 }
-$stmt->close();
 $stmt_payments->close();
 $conn->close();
 
-$selected_subjects = $student['selected_subjects'];
-$payment_upon_enrollment = $student['upon_enrollment'];
+$selected_subjects = $student['subjects'];
 $totalFees = calculateTotalFees(explode(',', $selected_subjects), $subjectFees);
-$totalPayments = array_sum(array_column($tuition_payments, 'amount')) + $payment_upon_enrollment;
+$totalPayments = array_sum(array_column($tuition_payments, 'amount')) + $student['upon_enrollment'];
 $remainingBalance = $totalFees - $totalPayments;
 ?>
 
@@ -93,7 +115,7 @@ $remainingBalance = $totalFees - $totalPayments;
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #e9ecef;
             margin: 0;
             padding: 20px;
             display: flex;
@@ -101,26 +123,26 @@ $remainingBalance = $totalFees - $totalPayments;
             align-items: center;
         }
         .page {
-            background: white;
+            background: #ffffff;
             padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 800px;
             margin: 20px 0;
-            page-break-after: always; /* Forces a page break after each page */
         }
         h2 {
             text-align: center;
-            color: #333;
+            color: #343a40;
         }
         .detail {
             margin: 10px 0;
             padding: 10px;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid #ced4da;
         }
         label {
             font-weight: bold;
+            color: #495057;
         }
         table {
             width: 100%;
@@ -130,7 +152,7 @@ $remainingBalance = $totalFees - $totalPayments;
         th, td {
             padding: 10px;
             text-align: left;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid #ced4da;
         }
         th {
             background-color: #007bff;
@@ -152,7 +174,7 @@ $remainingBalance = $totalFees - $totalPayments;
             background-color: #0056b3;
         }
         .right-align {
-            text-align: right; /* Aligns text to the right */
+            text-align: right;
         }
         .button-container {
             display: flex;
@@ -164,15 +186,30 @@ $remainingBalance = $totalFees - $totalPayments;
         function printPage() {
             window.print();
         }
+        function printReceipt() {
+            var receiptContent = document.getElementById('receipt-section').innerHTML;
+            var originalContent = document.body.innerHTML;
+
+            document.body.innerHTML = receiptContent;
+            window.print();
+            document.body.innerHTML = originalContent;
+        }
     </script>
 </head>
 <body>
-
-<!-- Page 1: Student Details -->
 <div class="page">
     <h2>Student Details</h2>
     <div class="detail">
-        <label>Name:</label> <?= htmlspecialchars($student['first_name']) ?> <?= htmlspecialchars($student['middle_name']) ?> <?= htmlspecialchars($student['last_name']) ?>
+        <label>USN:</label> <?= htmlspecialchars($student['usn']) ?>
+    </div>
+    <div class="detail">
+        <label>Last Name:</label> <?= htmlspecialchars($student['last_name']) ?>
+    </div>
+    <div class="detail">
+        <label>First Name:</label> <?= htmlspecialchars($student['first_name']) ?>
+    </div>
+    <div class="detail">
+        <label>Middle Name:</label> <?= htmlspecialchars($student['middle_name']) ?>
     </div>
     <div class="detail">
         <label>Email:</label> <?= htmlspecialchars($student['email']) ?>
@@ -181,18 +218,46 @@ $remainingBalance = $totalFees - $totalPayments;
         <label>Contact:</label> <?= htmlspecialchars($student['contact']) ?>
     </div>
     <div class="detail">
+        <label>LRN:</label> <?= htmlspecialchars($student['lrn']) ?>
+    </div>
+    <div class="detail">
+        <label>Date of Birth:</label> <?= htmlspecialchars($student['dob']) ?>
+    </div>
+    <div class="detail">
+        <label>Place of Birth:</label> <?= htmlspecialchars($student['pob']) ?>
+    </div>
+    <div class="detail">
+        <label>Age:</label> <?= htmlspecialchars($student['age']) ?>
+    </div>
+    <div class="detail">
         <label>Course ID:</label> <?= htmlspecialchars($student['course_id']) ?>
     </div>
     <div class="detail">
         <label>Year Level:</label> <?= htmlspecialchars($student['year_level']) ?>
     </div>
     <div class="detail">
-        <label>Enrollment Date:</label> <?= htmlspecialchars($created_at) ?>
+        <label>Upon Enrollment:</label> <?= htmlspecialchars($student['upon_enrollment']) ?>
+    </div>
+    <div class="detail">
+        <label>Sex:</label> <?= htmlspecialchars($student['sex']) ?>
+    </div>
+    <div class="detail">
+        <label>Civil Status:</label> <?= htmlspecialchars($student['civil_status']) ?>
+    </div>
+    <div class="detail">
+        <label>Guardian Name:</label> <?= htmlspecialchars($student['guardian_name']) ?>
+    </div>
+    <div class="detail">
+        <label>Guardian Contact:</label> <?= htmlspecialchars($student['guardian_contact']) ?>
+    </div>
+    <div class="detail">
+        <label>Created At:</label> <?= htmlspecialchars($created_at) ?>
+    </div>
+    <div class="detail">
+        <label>Address:</label> <?= htmlspecialchars($student['address']) ?>
     </div>
 </div>
-
-<!-- Page 2: Subject Details -->
-<div class="page">
+<div class ="page">
     <h2>Subject Details</h2>
     <div class="detail">
         <label>Selected Subjects:</label>
@@ -228,10 +293,8 @@ $remainingBalance = $totalFees - $totalPayments;
                 echo '<table style="width: 100%;">';
                 echo '<thead><tr><th style="text-align: left;">Payment Amount</th><th class="right-align">Payment Date</th></tr></thead>';
                 echo '<tbody>';
-
-                // Include the payment upon enrollment in the history
-                if ($payment_upon_enrollment > 0) {
-                    echo '<tr><td>₱' . number_format($payment_upon_enrollment, 2) . '</td><td class="right-align">' . date('F j, Y', strtotime($created_at)) . '</td></tr>'; // Use created_at here
+                if ($student['upon_enrollment'] > 0) {
+                    echo '<tr><td>₱' . number_format($student['upon_enrollment'], 2) . '</td><td class="right-align">' . date('F j, Y', strtotime($created_at)) . '</td></tr>';
                 }
                 if (!empty($tuition_payments)) {
                     foreach ($tuition_payments as $payment) {
@@ -252,8 +315,8 @@ $remainingBalance = $totalFees - $totalPayments;
     <div class="detail button-container">
         <a href="<?= htmlspecialchars(strtolower($course_id)) ?>.php?course_id=<?= htmlspecialchars($course_id) ?>" class="button">Back to <?= htmlspecialchars($course_id) ?> Students</a>
         <button class="button print-button" onclick="printPage()">Print Details</button>
+        <a href="reciept.php?id=<?= htmlspecialchars($student_id) ?>" class="button print-button">Print Receipt</a>
     </div>
 </div>
-
 </body>
 </html>
